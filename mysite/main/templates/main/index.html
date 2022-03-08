@@ -6,9 +6,9 @@
 <h1>Главная страница</h1>
 <h3>Контроллеры:</h3>
 <ul>
-    <li><a href="cont1">Контроллер 1</a></li>
-    <li><a href="cont2">Контроллер 2</a></li>
-    <li><a href="cont2">Контроллер 3</a></li>
+    {% for cont in controllers %}
+        <li><a href="controllers/{{ cont.prefix }}">Контроллер {{ cont.prefix }}</a></li>
+    {% endfor %}
 </ul>
 <script>
     {% include 'includes/js_connect.html' %}

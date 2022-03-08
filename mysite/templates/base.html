@@ -6,12 +6,13 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
     {% include 'includes/js_clock.html' %}
+    {% block head %}
+    {% endblock %}
 </head>
 <body>
     <nav class="topnav">
         <a href="/"><big>Главная страница</big></a>
         <a href="/reports">Отчеты</a>
-        <a href="/pump">Давление воды</a>
         <div  class="topnav-right">
             <div class="dropdown" style="float:right;">
                 <button class="dropbtn">{{ user.get_username }}</button>
