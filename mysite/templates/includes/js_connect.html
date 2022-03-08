@@ -1,0 +1,7 @@
+{% block content %}
+    const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/'
+        );
+{% endblock %}

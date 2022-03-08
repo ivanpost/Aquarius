@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Aquarius{% endblock %}
+
+{% block content %}
+<h1>Главная страница</h1>
+<h3>Контроллеры:</h3>
+<ul>
+    <li><a href="cont1">Контроллер 1</a></li>
+    <li><a href="cont2">Контроллер 2</a></li>
+    <li><a href="cont2">Контроллер 3</a></li>
+</ul>
+<script>
+    {% include 'includes/js_connect.html' %}
+</script>
+{% endblock %}
