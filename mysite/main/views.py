@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import Controller, Channel, Program
 from operator import add
+from datetime import datetime, time, timedelta
 
 DAYS = {'monday': 'Понедельник',
         'tuesday': 'Вторник',
@@ -71,14 +72,15 @@ def controller(request, prefix):
 @login_required
 def controller_day(request, prefix, day):
     def get_m(t):
-        out = t // 5
-        if t % 5 > 0:
+        out = t // 2
+        if t % 2 > 0:
             out += 1
         return out
 
     def get_time(h, m, t):
         start = [h, get_m(m)]
-        stop = [h + t // 60, get_m(m + t % 60)]
+        stop = [h + t // 60, get_m((m + t % 60) % 60)]
+        stop[0] += (m + t % 60) // 60
         return start, stop
 
     channels = Channel.objects.filter(controller__prefix=prefix)
@@ -87,21 +89,19 @@ def controller_day(request, prefix, day):
         lines.append([])
         for j in range(24):
             lines[i].append([])
-            for g in range(12):
+            for g in range(30):
                 lines[i][j].append(0)
     day_num = list(DAYS.keys()).index(day) + 1
     programs = Program.objects.filter(channel__controller__prefix=prefix, days__contains=str(day_num))
 
 
     for p in programs:
-        start = [p.hour, p.minute // 5]
-        if p.minute % 5 > 0:
-            start[1] += 1
-        stop = [p.hour + (p.t_max // 60), (p.minute + (p.t_max % 60)) // 5]
-        if (p.minute + (p.t_max % 60)) % 5 > 0:
+        start, stop = get_time(p.hour, p.minute, p.t_max)
+        print(p.hour, p.minute, p.t_max, start, stop)
+        if (p.minute + (p.t_max % 60)) % 2 > 0:
             stop[1] += 1
         for h in range(0, 24):
-            for m in range(0, 12):
+            for m in range(0, 30):
                 if h == start[0] and m >= start[1] and not start[0] == stop[0]:
                     if lines[p.channel.id-1][h][m] == 0:
                         lines[p.channel.id-1][h][m] = 1
