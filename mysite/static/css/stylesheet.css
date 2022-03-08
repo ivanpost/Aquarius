@@ -45,5 +45,18 @@
 .dropdown:hover .dropbtn {
 }
 
+.graph-right {
+border-right: 1px solid gray;
+}
+
+.graph-left {
+border-left: 1px solid gray;
+}
+
+.graph-header tr{
+border-bottom: 2px solid gray;
+width: 13%
+}
+
 
 

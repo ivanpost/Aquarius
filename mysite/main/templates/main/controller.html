@@ -7,78 +7,40 @@
 
 {% block content %}
 <h1 xmlns="http://www.w3.org/1999/html">Контроллер {{ prefix }}</h1>
-<table border="0">
+<table style="border-collapse:collapse;">
     <colgroup>
         <col>
         <col span="7">
     </colgroup>
-    <thead>
-        <tr>
+    <thead class="graph-header">
+        <tr class="graph">
             <th>Номер канала</th>
-            <th colspan="7">Дни недели</th>
+            <th colspan="24" style="width: 13% ">&nbsp;&nbsp;Понедельник&nbsp;&nbsp;</th>
+            <th colspan="24" style="width: 13%">&nbsp;&nbsp;Вторник&nbsp;&nbsp;</th>
+            <th colspan="24" style="width: 13%">&nbsp;&nbsp;Среда&nbsp;&nbsp;</th>
+            <th colspan="24" style="width: 13%">&nbsp;&nbsp;Четверг&nbsp;&nbsp;</th>
+            <th colspan="24" style="width: 13%">&nbsp;&nbsp;Пятница&nbsp;&nbsp;</th>
+            <th colspan="24" style="width: 13%">&nbsp;&nbsp;Суббота&nbsp;&nbsp;</th>
+            <th colspan="24" style="width: 13%">&nbsp;&nbsp;Воскресенье&nbsp;&nbsp;</th>
         </tr>
     </thead>
     <tbody>
-        {% for pr in programs %}
-
+        {% for line in lines_week %}
+            <tr {% if forloop.last %} style="border-bottom: 2px solid gray" {% endif %}>
+                <th>Канал {{ forloop.counter }}</th>
+                {% for week in line %}
+                    {% for h in week %}
+                        {% if forloop.first %}
+                            <th class="graph-left" {% if h == 1 %} style="background: green;" {% endif %}></th>
+                        {% elif forloop.last %}
+                            <th class="graph-right" {% if h == 1 %} style="background: green;" {% endif %}></th>
+                        {% else %}
+                            <th {% if h == 1 %} style="background: green;"{% endif %}></th>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </tr>
         {% endfor %}
-        <tr>
-            <th>1 канал</th>
-            <th style="background: green"></th>
-            <th>0</th>
-            <th>0</th>
-            <th>0</th>
-            <th>0</th>
-            <th>0</th>
-            <th>0</th>
-        </tr>
     </tbody>
 </table>
-
-<script>
-/*
-let canvas = document.getElementById("canvas");
-let ctx = canvas.getContext('2d');
-
-ctx.fillStyle = "gray";
-ctx.font = "16px serif";
-
-const startX = 5;
-const startY = 5;
-const channels = 50;
-const headerHeight = 20;
-const lineHeight = 15;
-const lineWidth = 1000;
-
-var flag = false;
-
-//строки
-for (var i = 0; i < channels; i++)
-{
-    if (flag) ctx.fillStyle = "#e2f2e1";
-    else ctx.fillStyle = "#FFFFFF";
-
-    ctx.fillRect(startX, startY + lineHeight * i, lineWidth, lineHeight);
-
-    flag = !flag;
-}
-
-//шапка
-ctx.fillStyle = "black";
-ctx.
-
-/*ctx.fillText(`№ канала`, 5, 18);
-
-ctx.font = "12px serif";
-for (let i = 0; i <= 50; i++)
-{
-    ctx.fillText(`${i}`, 5, start + (i * 12));
-    if (i != 50)
-
-}
-ctx.strokeRect(0,0, 1000, 50*12+start+6);
-*/
-*/
-</script>
-
 {% endblock %}

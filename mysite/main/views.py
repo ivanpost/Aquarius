@@ -23,34 +23,45 @@ def get_day(start, l):
             out.append(0)
     return out
 
-def get_day_sum(prgs, day):
-    return map(add, )
+def get_h_len(t_max):
+    l = t_max // 60
+    if t_max % 60 > 0:
+        l += 1
+    return l
+
+def get_week(chn):
+    prgs = Program.objects.filter(channel=chn)
+    out = []
+    for i in range(7):
+        out.append([])
+        for j in range(24):
+            out[i].append(0)
+    for p in prgs:
+        days = list(p.days)
+        for d in days:
+            for i, h in enumerate(get_day(p.hour, get_h_len(p.t_max))):
+                if out[int(d)-1][i] == 0:
+                    out[int(d) - 1][i] += h
+
+    return out
+
 
 @login_required
 def controller(request, prefix):
     programs = Program.objects.filter(channel__controller__prefix=prefix)
     channels = Channel.objects.filter(controller__prefix=prefix)
-    lines = [[[0] * 24] * 7] * len(channels)
-    chns = []
-    '''
-    print(programs)
-    for pr in programs:
-        days = list(pr.days)
-        print(days)
-        for d in days:
-            l = pr.t_max // 60
-            if pr.t_max % 60 > 0:
-                l += 1
-            print(l)
-            for h in range(pr.hour, pr.hour + l + 1):
-                lines[pr.channel.id-1][int(d)-1][h] = 1
+    lines = []
+    for chn in channels:
+        lines.append(get_week(chn))
 
-    for line in lines:
-        print(line)
-    '''
+
+
     return render(request, 'main/controller.html',
                   {
                       'prefix': prefix,
                       'lines_week': lines
                    })
 
+@login_required
+def controller_day(request, prefix, day):
+    render(request, 'main/controller_day')
