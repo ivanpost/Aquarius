@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+<a href="{% url 'controller' prefix %}"><big>Назад</big></a>
 <h1 xmlns="http://www.w3.org/1999/html">Контроллер {{ prefix }}</h1>
 <table style="border-collapse:collapse;">
     <colgroup>
@@ -27,7 +28,7 @@
     <tbody>
         {% for line in lines_week %}
             <tr {% if forloop.last %} style="border-bottom: 2px solid gray" {% endif %}>
-                <th><a href="{% url 'channel' prefix forloop.counter %}">Канал {{ forloop.counter }}</a></th>
+                <th>Канал {{ chn }}</th>
                 {% for week in line %}
                     {% for h in week %}
                         {% if forloop.first %}
@@ -43,4 +44,20 @@
         {% endfor %}
     </tbody>
 </table>
+
+
+<p>
+  <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+    Link with href
+  </a>
+  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    Button with data-bs-target
+  </button>
+</p>
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
+    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+  </div>
+</div>
+
 {% endblock %}

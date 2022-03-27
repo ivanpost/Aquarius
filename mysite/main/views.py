@@ -12,19 +12,16 @@ DAYS = {'monday': 'Понедельник',
         'saturday': 'Суббота',
         'sunday': 'Воскресенье'}
 
-@login_required
 def index(request):
     return render(request, 'main/index.html',
                   {
                       'controllers': Controller.objects.all()
                   })
 
-@login_required
 def reports(request):
     return render(request, 'main/reports.html')
 
 
-@login_required
 def controller(request, prefix):
     def get_day(start, l):
         out = []
@@ -69,7 +66,6 @@ def controller(request, prefix):
                       'lines_week': lines
                    })
 
-@login_required
 def controller_day(request, prefix, day):
     def get_m(t):
         out = t // 2
@@ -111,7 +107,6 @@ def controller_day(request, prefix, day):
                 elif h == stop[0] and m <= stop[1]:
                     if lines[p.channel.id-1][h][m] == 0:
                         lines[p.channel.id-1][h][m] = 1
-    print(lines)
 
     return render(request, 'main/controller_day.html',
                   {
@@ -120,3 +115,48 @@ def controller_day(request, prefix, day):
                       'hours_total': [i for i in range(24)],
                       'lines_day': lines
                    })
+
+def channel(request, prefix, chn):
+    def get_day(start, l):
+        out = []
+        for i in range(24):
+            if start <= i < (start + l):
+                out.append(1)
+            else:
+                out.append(0)
+        return out
+
+    def get_h_len(t_max):
+        l = t_max // 60
+        if t_max % 60 > 0:
+            l += 1
+        return l
+
+    def get_week(chn, chns):
+        prgs = Program.objects.filter(channel=chn)
+        out = []
+        for i in range(7):
+            out.append([])
+            for j in range(24):
+                out[i].append(0)
+        for p in prgs:
+            days = list(p.days)
+            for d in days:
+                for i, h in enumerate(get_day(p.hour, get_h_len(p.t_max))):
+                    if out[int(d) - 1][i] == 0:
+                        out[int(d) - 1][i] += h
+
+        return out
+
+    programs = Program.objects.filter(channel__controller__prefix=prefix)
+    channels = Channel.objects.filter(controller__prefix=prefix)
+    lines = []
+    lines.append(get_week(int(chn), channels))
+
+    return render(request, 'main/channel.html',
+                  {
+                      'prefix': prefix,
+                      'lines_week': lines,
+                      'chn': int(chn)
+                   })
+

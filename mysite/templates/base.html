@@ -3,27 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
-    {% include 'includes/js_clock.html' %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
     {% block head %}
     {% endblock %}
 </head>
 <body>
-    <nav class="topnav">
-        <a href="/"><big>Главная страница</big></a>
-        <a href="/reports">Отчеты</a>
-        <div  class="topnav-right">
-            <div class="dropdown" style="float:right;">
-                <button class="dropbtn">{{ user.get_username }}</button>
-                <div class="dropdown-content">
-                    <a href="/accounts/logout">Выйти</a>
-                </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'index' %}">Главная</a>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'reports' %}">Отчеты</a>
+                    </li>
+                </ul>
             </div>
-        </div>
-        <div  class="topnav-right">
-            <div id="id_clock"></div>
-            <script>digitalClock();</script>
         </div>
     </nav>
     <hr>
