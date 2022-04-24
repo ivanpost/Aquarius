@@ -1,8 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Controller, Channel, Program
 from operator import add
 from datetime import datetime, time, timedelta
+import time
 
 DAYS = {'monday': 'Понедельник',
         'tuesday': 'Вторник',
@@ -132,7 +133,7 @@ def channel(request, prefix, chn):
             l += 1
         return l
 
-    def get_week(chn, chns):
+    def get_week(chn):
         prgs = Program.objects.filter(channel=chn)
         out = []
         for i in range(7):
@@ -148,15 +149,88 @@ def channel(request, prefix, chn):
 
         return out
 
-    programs = Program.objects.filter(channel__controller__prefix=prefix)
-    channels = Channel.objects.filter(controller__prefix=prefix)
+    def norm_time(h, m):
+        nh = '0' * (2 - len(str(h))) + str(h)
+        nm = '0' * (2 - len(str(m))) + str(m)
+        out = f'{nh}:{nm}'
+        return out
+
+    class PrgData:
+        id = 0
+        header = ""
+        d1 = 0
+        d2 = 0
+        d3 = 0
+        d4 = 0
+        d5 = 0
+        d6 = 0
+        d7 = 0
+        t_start = ""
+        t_stop_min = ""
+        t_stop_max = ""
+
+        def __init__(self, id, days, hour, minute, t_min, t_max):
+            self.id = id
+            self.d1 = '1' in days
+            self.d2 = '2' in days
+            self.d3 = '3' in days
+            self.d4 = '4' in days
+            self.d5 = '5' in days
+            self.d6 = '6' in days
+            self.d7 = '7' in days
+            self.t_start = norm_time(hour, minute)
+            self.t_stop_min = norm_time(t_min // 60, t_min % 60)
+            self.t_stop_max = norm_time(t_max // 60, t_max % 60)
+            self.header = f"{days} | {self.t_start} - {self.t_stop_max}"
+
+    chan = Channel.objects.get(controller__prefix=prefix, id=chn)
+    programs = Program.objects.filter(channel=chan)
     lines = []
-    lines.append(get_week(int(chn), channels))
+    prgs = []
+    lines.append(get_week(chan))
+    for pr in programs:
+        prgs.append(PrgData(pr.id, pr.days, pr.hour, pr.minute, pr.t_min, pr.t_max))
+    if request.method == 'POST':
+        print(request.POST)
+        data = request.POST.dict()
+        if "create" in data.keys():
+            prg = Program()
+            prg.channel = chan
+            prg.days = ''.join([str(i+1) for i in range(7) if f'days_{i}' in data.keys()])
+            if (prg.days != ''):
+                prg.hour = int(data['time_start'][:2])
+                prg.minute = int(data['time_start'][3:])
+                t_start = timedelta(hours=prg.hour, minutes=prg.minute)
+                t_end_min = timedelta(hours=int(data['time_end_min'][:2]), minutes=int(data['time_end_min'][3:]))
+                t_end_max = timedelta(hours=int(data['time_end_max'][:2]),
+                                      minutes=int(data['time_end_max'][3:]))
+                prg.t_min = (t_end_min-t_start).total_seconds()//60
+                prg.t_max = (t_end_max - t_start).total_seconds() // 60
+                prg.save()
+                return redirect('channel', prefix=prefix, chn=chn)
+        elif "id" in data.keys():
+            prg = Program.objects.get(channel=chan, id=data['id'])
+            if "delete" in data.keys():
+                prg.delete()
+                return redirect('channel', prefix=prefix, chn=chn)
+            prg.days = ''.join([str(i+1) for i in range(7) if f'days_{i}' in data.keys()])
+            if (prg.days != ''):
+                prg.hour = int(data['time_start'][:2])
+                prg.minute = int(data['time_start'][3:])
+                t_start = timedelta(hours=prg.hour, minutes=prg.minute)
+                t_end_min = timedelta(hours=int(data['time_end_min'][:2]), minutes=int(data['time_end_min'][3:]))
+                t_end_max = timedelta(hours=int(data['time_end_max'][:2]),
+                                      minutes=int(data['time_end_max'][3:]))
+                prg.t_min = (t_end_min-t_start).total_seconds()//60
+                prg.t_max = (t_end_max - t_start).total_seconds() // 60
+                prg.save()
+                return redirect('channel', prefix=prefix, chn=chn)
 
     return render(request, 'main/channel.html',
                   {
                       'prefix': prefix,
                       'lines_week': lines,
-                      'chn': int(chn)
+                      'chn': int(chn),
+                      'prgs': prgs
                    })
 

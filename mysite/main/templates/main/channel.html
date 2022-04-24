@@ -6,8 +6,11 @@
 {% endblock %}
 
 {% block content %}
+<h1>Контроллер {{ prefix }}</h1>
 <a href="{% url 'controller' prefix %}"><big>Назад</big></a>
-<h1 xmlns="http://www.w3.org/1999/html">Контроллер {{ prefix }}</h1>
+<hr>
+<h3>График включений</h3>
+<br>
 <table style="border-collapse:collapse;">
     <colgroup>
         <col>
@@ -16,13 +19,13 @@
     <thead class="graph-header">
         <tr class="graph">
             <th>Номер канала</th>
-            <th colspan="24" style="width: 13% "><a href="{{prefix}}/monday">Понедельник</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/tuesday">Вторник</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/wednesday">Среда</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/thursday">Четверг</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/friday">Пятница</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/saturday">Суббота</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/sunday">Воскресенье</a></th>
+            <th colspan="24" style="width: 13% "><a href="{% url 'controller_day' prefix 'monday' %}">Понедельник</a></th>
+            <th colspan="24" style="width: 13%"><a href="{% url 'controller_day' prefix 'tuesday' %}">Вторник</a></th>
+            <th colspan="24" style="width: 13%"><a href="{% url 'controller_day' prefix 'wednesday' %}">Среда</a></th>
+            <th colspan="24" style="width: 13%"><a href="{% url 'controller_day' prefix 'thursday' %}">Четверг</a></th>
+            <th colspan="24" style="width: 13%"><a href="{% url 'controller_day' prefix 'friday' %}">Пятница</a></th>
+            <th colspan="24" style="width: 13%"><a href="{% url 'controller_day' prefix 'saturday' %}">Суббота</a></th>
+            <th colspan="24" style="width: 13%"><a href="{% url 'controller_day' prefix 'sunday' %}">Воскресенье</a></th>
         </tr>
     </thead>
     <tbody>
@@ -45,19 +48,100 @@
     </tbody>
 </table>
 
+<hr>
+<h3>Программы</h3>
+<br>
 
-<p>
-  <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-    Link with href
-  </a>
-  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-    Button with data-bs-target
-  </button>
-</p>
-<div class="collapse" id="collapseExample">
-  <div class="card card-body">
-    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+<div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header" id="headingCreate">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCreate" aria-expanded="true" aria-controls="collapseCreate">
+        Добавить программу
+      </button>
+    </h2>
+    <div id="collapseCreate" class="accordion-collapse collapse show" aria-labelledby="headingCreate" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+          <form action="" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="create">
+              <h5>Дни недели</h5>
+              <input type="checkbox" id="day0" name="days_0">
+              <label for="day0">Понедельник</label><br>
+              <input type="checkbox" id="day1" name="days_1">
+              <label for="day1">Вторник</label><br>
+              <input type="checkbox" id="day2" name="days_2">
+              <label for="day2">Среда</label><br>
+              <input type="checkbox" id="day3" name="days_3">
+              <label for="day3">Четверг</label><br>
+              <input type="checkbox" id="day4" name="days_4">
+              <label for="day4">Пятница</label><br>
+              <input type="checkbox" id="day5" name="days_5">
+              <label for="day5">Суббота</label><br>
+              <input type="checkbox" id="day6" name="days_6">
+              <label for="day6">Воскресенье</label><br>
+              <br>
+              <h5>Время</h5>
+              <label for="time_start">Начало</label>
+              <input type="time" id="time_start" name="time_start" >
+              <br><p></p>
+              <label for="time_end_min">Конец при мин. температуре</label>
+              <input type="time" id="time_end_min" name="time_end_min" >
+              <br><p></p>
+              <label for="time_end_max">Конец при макс. температуре</label>
+              <input type="time" id="time_end_max" name="time_end_max" >
+              <br>
+              <hr>
+              <button type="submit" class="btn btn-primary" >Добавить</button>
+          </form>
+      </div>
+    </div>
   </div>
+    {% for prg in prgs %}
+    <div class="accordion-item">
+    <h2 class="accordion-header" id="heading{{prg.id}}">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{prg.id}}" aria-expanded="false" aria-controls="collapse{{prg.id}}">
+        {{prg.header}}
+      </button>
+    </h2>
+    <div id="collapse{{prg.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{prg.id}}" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+          <form action="" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="id" value="{{prg.id}}">
+              <h5>Дни недели</h5>
+              <input type="checkbox" id="{{prg.id}}_day0" name="days_0" {% if prg.d1 %} checked {% endif %}>
+              <label for="{{prg.id}}_day0">Понедельник</label><br>
+              <input type="checkbox" id="{{prg.id}}_day1" name="days_1" {% if prg.d2 %} checked {% endif %}>
+              <label for="{{prg.id}}_day1">Вторник</label><br>
+              <input type="checkbox" id="{{prg.id}}_day2" name="days_2" {% if prg.d3 %} checked {% endif %}>
+              <label for="{{prg.id}}_day2">Среда</label><br>
+              <input type="checkbox" id="{{prg.id}}_day3" name="days_3" {% if prg.d4 %} checked {% endif %}>
+              <label for="{{prg.id}}_day3">Четверг</label><br>
+              <input type="checkbox" id="{{prg.id}}_day4" name="days_4" {% if prg.d5 %} checked {% endif %}>
+              <label for="{{prg.id}}_day4">Пятница</label><br>
+              <input type="checkbox" id="{{prg.id}}_day5" name="days_5" {% if prg.d6 %} checked {% endif %}>
+              <label for="{{prg.id}}_day5">Суббота</label><br>
+              <input type="checkbox" id="{{prg.id}}_day6" name="days_6" {% if prg.d7 %} checked {% endif %}>
+              <label for="{{prg.id}}_day6">Воскресенье</label><br>
+              <br>
+              <h5>Время</h5>
+              <label for="{{prg.id}}_time_start">Начало</label>
+              <input type="time" id="{{prg.id}}_time_start" name="time_start" value="{{prg.t_start}}">
+              <br><p></p>
+              <label for="{{prg.id}}_time_end_min">Конец при мин. температуре</label>
+              <input type="time" id="{{prg.id}}_time_end_min" name="time_end_min" value="{{prg.t_stop_min}}">
+              <br><p></p>
+              <label for="{{prg.id}}_time_end_max">Конец при макс. температуре</label>
+              <input type="time" id="{{prg.id}}_time_end_max" name="time_end_max" value="{{prg.t_stop_max}}">
+              <br>
+              <hr>
+              <button type="submit" class="btn btn-primary" >Сохранить</button>
+              <button type="submit" class="btn btn-danger" name="delete">Удалить</button>
+          </form>
+        </div>
+    </div>
+  </div>
+    {% endfor %}
 </div>
 
 {% endblock %}
