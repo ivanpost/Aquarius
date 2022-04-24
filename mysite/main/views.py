@@ -94,7 +94,6 @@ def controller_day(request, prefix, day):
 
     for p in programs:
         start, stop = get_time(p.hour, p.minute, p.t_max)
-        print(p.hour, p.minute, p.t_max, start, stop)
         if (p.minute + (p.t_max % 60)) % 2 > 0:
             stop[1] += 1
         for h in range(0, 24):
@@ -191,7 +190,6 @@ def channel(request, prefix, chn):
     for pr in programs:
         prgs.append(PrgData(pr.id, pr.days, pr.hour, pr.minute, pr.t_min, pr.t_max))
     if request.method == 'POST':
-        print(request.POST)
         data = request.POST.dict()
         if "create" in data.keys():
             prg = Program()

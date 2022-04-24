@@ -11,17 +11,23 @@ def on_message(client, userdata, message):
 class MQTTManager:
 
     client = None
+    onConnected = None
     topicHandlers = {}
     host = ""
     port = 0
     user = ""
     password = ""
-    prefix = "WEB/"
+    prefix = ""
+
+    def send(self, topic, data):
+        print(f"MQTT: Send to [{topic}]: {data}")
+        self.client.publish(self.prefix + topic, data)
 
     def connect(self):
         self.client = MQTT.Client("WEB1")
         self.client.username_pw_set(self.user, self.password)
         self.client.on_message = lambda cl, userdata, message: self.on_message(userdata, message)
+        if not self.onConnected == None: self.client.on_connect = lambda cl, ud, fl, rc: self.onConnected(self, cl, ud, fl, rc)
         self.client.connect(self.host, port=self.port)
         print(f'MQTT: Connected to {self.user}@{self.host}:{self.port}')
         self.client.loop_start()
@@ -32,21 +38,26 @@ class MQTTManager:
     def on_message(self, userdata, message):
         print(f'MQTT: [{message.topic.replace(self.prefix, "")}] - {str(message.payload.decode("utf-8"))}')
         if message.topic.replace(self.prefix, '') in self.topicHandlers.keys():
-            self.topicHandlers[message.topic.replace(self.prefix, "")](str(message.payload.decode("utf-8")))
+            self.topicHandlers[message.topic.replace(self.prefix, "")](self, str(message.payload.decode("utf-8")))
 
-    def __init__(self, host, port, user, password):
+    def __init__(self, host, port, user, password, prefix=""):
         self.host = str(host)
         self.port = int(port)
         self.user = str(user)
         self.password = str(password)
+        self.prefix = str(prefix)
 
-def on_message_test(message):
+def on_message_kontr(manager, message):
     print(message)
 
+def on_connected(manager, client, userdata, flags, rc):
+    manager.send("aqua_smart", "1.2.3.4.3.2.1.8.8.8.8.8.8.8.8.8.8.0.80.9.8.7.6.7.8.9.9")
+
 if __name__ == "__main__":
-    cl = MQTTManager('185.134.36.37', '18883', 'WEB', '456456')
-    cl.topicHandlers['test'] = on_message_test
-    cl.connect()
+    m = MQTTManager('185.134.36.37', '18883', '221', '183015864', "221/")
+    m.onConnected = on_connected
+    m.topicHandlers["aqua_kontr"] = on_message_kontr
+    m.connect()
 
     while True:
         pass
