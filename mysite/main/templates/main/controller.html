@@ -7,7 +7,41 @@
 
 {% block content %}
 <h1>Контроллер {{ prefix }}</h1>
-
+<hr>
+<h3>Информация</h3>
+<br>
+<label>Неделя: {% if cont.week %} Четная {% else %} Нечетная {% endif %}</label><br>
+<label>День недели: {{ day }}</label><br>
+<label>Время: {{ cont.time|date:"G:i" }}</label><br>
+<label>Температура №1: {{ cont.t1 }}</label><br>
+<label>Температура №2: {{ cont.t2 }}</label><br>
+<label>Давление: {{ cont.pressure }}</label><br>
+<label>Поток: {{ cont.stream }} л/мин</label><br>
+<label>Датчик дождя:
+    {% if cont.rain %} <span  style="color: green">Активен</span>
+    {% else %} <span  style="color: red">Неактивен</span>  {% endif %}
+</label><br>
+<label>Пауза в поливе:
+    {% if cont.pause %} <span  style="color: green">Включена</span>
+    {% else %} <span  style="color: red">Выключена</span>  {% endif %}
+</label><br>
+<br>
+<label>Номер контроллера: {{ cont.num }}</label><br>
+<label>IP: {{ cont.ip }}</label><br>
+<label>Версия прошивки контроллера: {{ cont.version }}</label><br>
+<label>Версия прошивки ESP: {{ cont.esp_v }}</label><br>
+<label>Подключение к точке доступа:
+    {% if cont.esp_connected %} <span  style="color: green">Подключено</span>
+    {% else %} <span  style="color: red">Нет подключения</span>  {% endif %}
+</label><br>
+<label>Статус AP:
+    {% if cont.esp_ap %} <span  style="color: green">Открыта</span>
+    {% else %} <span  style="color: red">Закрыта</span>  {% endif %}
+</label><br>
+<label>Подключение к MQTT:
+    {% if cont.esp_mqtt %} <span  style="color: green">Подключено</span>
+    {% else %} <span  style="color: red">Нет подключения</span>  {% endif %}
+</label><br>
 <hr>
 <h3>График включений</h3>
 <br>
@@ -19,23 +53,29 @@
     <thead class="graph-header">
         <tr class="graph">
             <th>Номер канала</th>
-            <th colspan="24" style="width: 13% "><a href="{{prefix}}/monday">Понедельник</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/tuesday">Вторник</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/wednesday">Среда</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/thursday">Четверг</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/friday">Пятница</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/saturday">Суббота</a></th>
-            <th colspan="24" style="width: 13%"><a href="{{prefix}}/sunday">Воскресенье</a></th>
+            <th>Статус</th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/monday">Понедельник</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/tuesday">Вторник</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/wednesday">Среда</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/thursday">Четверг</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/friday">Пятница</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/saturday">Суббота</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/sunday">Воскресенье</a></th>
         </tr>
     </thead>
     <tbody>
         {% for line in lines_week %}
             <tr {% if forloop.last %} style="border-bottom: 2px solid gray" {% endif %}>
                 <th><a href="{% url 'channel' prefix forloop.counter %}">Канал {{ forloop.counter }}</a></th>
-                {% for week in line %}
+                {% if line.status %}
+                <th class="graph-left" style="background: #5d8a4d;"> Вкл </th>
+                {% else %}
+                <th class="graph-left" style="background: #c25642;"> Выкл </th>
+                {% endif %}
+                {% for week in line.data %}
                     {% for h in week %}
                         {% if forloop.first %}
-                            <th class="graph-left" {% if h == 1 %} style="background: green;" {% endif %}></th>
+                            <th class="graph-left" {% if h == 1 %} style="background: green; " {% endif %}></th>
                         {% elif forloop.last %}
                             <th class="graph-right" {% if h == 1 %} style="background: green;" {% endif %}></th>
                         {% else %}
@@ -47,4 +87,6 @@
         {% endfor %}
     </tbody>
 </table>
+<br>
+<br>
 {% endblock %}

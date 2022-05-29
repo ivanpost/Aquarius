@@ -57,15 +57,24 @@ def controller(request, prefix):
 
     programs = Program.objects.filter(channel__controller__prefix=prefix)
     channels = Channel.objects.filter(controller__prefix=prefix)
+    cont = Controller.objects.get(prefix=prefix)
+
+    class Line:
+        def __init__(self, status, data):
+            self.status = status
+            self.data = data
+
     lines = []
     for chn in channels:
-        lines.append(get_week(chn))
+        lines.append(Line(chn.state, get_week(chn)))
 
     return render(request, 'main/controller.html',
                   {
                       'prefix': prefix,
-                      'lines_week': lines
-                   })
+                      'lines_week': lines,
+                      'cont': cont,
+                      'day': list(DAYS.values())[cont.day-1]
+                    })
 
 def controller_day(request, prefix, day):
     def get_m(t):
