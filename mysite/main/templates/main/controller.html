@@ -1,92 +1,288 @@
-{% extends "base.html" %}
 
-{% block title %}{{ prefix }}{% endblock %}
 
-{% block head %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0">
+	<meta name="format-detection" content="telephone=no">
+	<title>Aquarius</title>
+	{% load static %}
 
-{% block content %}
-<h1>Контроллер {{ prefix }}</h1>
-<hr>
-<h3>Информация</h3>
-<br>
-<label>Неделя: {% if cont.week %} Четная {% else %} Нечетная {% endif %}</label><br>
-<label>День недели: {{ day }}</label><br>
-<label>Время: {{ cont.time|date:"G:i" }}</label><br>
-<label>Температура №1: {{ cont.t1 }}</label><br>
-<label>Температура №2: {{ cont.t2 }}</label><br>
-<label>Давление: {{ cont.pressure }}</label><br>
-<label>Поток: {{ cont.stream }} л/мин</label><br>
-<label>Датчик дождя:
-    {% if cont.rain %} <span  style="color: green">Активен</span>
-    {% else %} <span  style="color: red">Неактивен</span>  {% endif %}
-</label><br>
-<label>Пауза в поливе:
-    {% if cont.pause %} <span  style="color: green">Включена</span>
-    {% else %} <span  style="color: red">Выключена</span>  {% endif %}
-</label><br>
-<br>
-<label>Номер контроллера: {{ cont.num }}</label><br>
-<label>IP: {{ cont.ip }}</label><br>
-<label>Версия прошивки контроллера: {{ cont.version }}</label><br>
-<label>Версия прошивки ESP: {{ cont.esp_v }}</label><br>
-<label>Подключение к точке доступа:
-    {% if cont.esp_connected %} <span  style="color: green">Подключено</span>
-    {% else %} <span  style="color: red">Нет подключения</span>  {% endif %}
-</label><br>
-<label>Статус AP:
-    {% if cont.esp_ap %} <span  style="color: green">Открыта</span>
-    {% else %} <span  style="color: red">Закрыта</span>  {% endif %}
-</label><br>
-<label>Подключение к MQTT:
-    {% if cont.esp_mqtt %} <span  style="color: green">Подключено</span>
-    {% else %} <span  style="color: red">Нет подключения</span>  {% endif %}
-</label><br>
-<hr>
-<h3>График включений</h3>
-<br>
-<table style="border-collapse:collapse;">
-    <colgroup>
-        <col>
-        <col span="7">
-    </colgroup>
-    <thead class="graph-header">
-        <tr class="graph">
-            <th>Номер канала</th>
-            <th>Статус</th>
-            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/monday">Понедельник</a></th>
-            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/tuesday">Вторник</a></th>
-            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/wednesday">Среда</a></th>
-            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/thursday">Четверг</a></th>
-            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/friday">Пятница</a></th>
-            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/saturday">Суббота</a></th>
-            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/sunday">Воскресенье</a></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for line in lines_week %}
-            <tr {% if forloop.last %} style="border-bottom: 2px solid gray" {% endif %}>
-                <th><a href="{% url 'channel' prefix forloop.counter %}">Канал {{ forloop.counter }}</a></th>
-                {% if line.status %}
-                <th class="graph-left" style="background: #5d8a4d;"> Вкл </th>
-                {% else %}
-                <th class="graph-left" style="background: #c25642;"> Выкл </th>
-                {% endif %}
-                {% for week in line.data %}
-                    {% for h in week %}
-                        {% if forloop.first %}
-                            <th class="graph-left" {% if h == 1 %} style="background: green; " {% endif %}></th>
-                        {% elif forloop.last %}
-                            <th class="graph-right" {% if h == 1 %} style="background: green;" {% endif %}></th>
-                        {% else %}
-                            <th {% if h == 1 %} style="background: green;"{% endif %}></th>
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<br>
-<br>
-{% endblock %}
+	<link rel="stylesheet" href="{% static 'css/controller.css' %}">
+</head>
+<body>
+	<div class="wrapper">
+
+		<div class="page">
+			<div class="page__row">
+
+				<div class="page__element page__head">
+				 <div class="mhead">
+					<a target="_blank" href="https://hi-garden.ru/" class="mhead__logo xhref">Hi-Garden</a>
+					<div class="mhead__title">Aquarius Main</Main></div>
+					<a target="_blank" href="https://hi-garden.ru/aqua2-manual" class="mhead__manual xhref">Menu</a>		 
+				 </div>
+			
+				</div>
+
+			  <div class="page__element page__body">
+
+				<div class="mbody">
+
+					 <div class="status">
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlew">&#8986; &nbsp; &nbsp; 23:30</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlew">Следующее<br>включение</div>
+							</div>
+							
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlew">MQTT - OK!</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlew">&#9200; &nbsp; &nbsp; 23:40</div>
+							</div>
+							
+						</div>
+
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlew">
+									Aquarius 294<br>Ягодное, Энерг 13
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlew">
+									Канал 2
+								</div>
+							</div>
+							
+						</div>
+
+						<div class="status__row">
+							<div class="status__column">
+								<div class="titleb">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Каналы</a>									
+								</div>
+
+							</div>
+							<div class="status__column">
+								<div class="titleb">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Ручное</a>
+								</div>
+
+							</div>
+							<div class="status__column">
+								<div class="titleb">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Пауза</a>
+								</div>
+
+							</div>
+						</div>
+
+						<div class="status__row">
+							<div class="status__column">
+								<div class="titlef onled01">
+									<a onClick="javascript:chn_1_10();" role="button" href="#" class="myxhref">Каналы 1-10<br></a>
+									<div class="chnon">1, 7, 10</div>
+								</div>
+								
+							</div>
+
+							<div class="status__column">
+								<div class="titlef onled11">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Каналы 11-20<br></a>
+									<div class="chnon">11, 14, 19</div>
+								</div>
+								
+							</div>
+
+							<div class="status__column">
+								<div class="titlef onled21">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Каналы 21-30<br></a>
+									<div class="chnon">-</div>
+								</div>
+								
+							</div>
+
+						</div>
+
+						<div id="chns_1-10">
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlev onled1">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 1</a>
+									<div class="meandr mea1">_∏_∏_</div>
+								</div>
+								
+							</div>
+
+							<div class="status__column">
+								<div class="titlev onled2">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 2</a>
+									<div class="meandr mea2">_∏_∏_</div>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev onled3">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 3</a>
+									<div class="meandr mea3">_∏_∏_</div>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev onled4">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 4</a>
+									<div class="meandr mea4">_∏_∏_</div>
+								</div>
+							</div>
+
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlev onled5">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 5</a>
+									<div class="meandr mea5">_∏_∏_</div>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev onled6">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 6</a>
+									<div class="meandr mea6">_∏_∏_</div>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev onled7">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 7</a>
+									<div class="meandr mea7">_∏_∏_</div>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev onled8">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 8</a>
+									<div class="meandr mea8">_∏_∏_</div>
+								</div>
+							</div>
+
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlev onledw">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Влажность</a>
+									<div class="chnon">45%</div>	
+								</div>
+								
+							</div>
+
+							<div class="status__column">
+								<div class="titlev onled9">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 9</a>
+									<div class="meandr mea9">_∏_∏_</div>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev onled10">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 10</a>
+									<div class="meandr mea10">_∏_∏_</div>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev onledp">
+									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Насос</a>
+									<div class="chnon">ON</div>
+								</div>
+								
+							</div>
+
+						</div>
+							</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="imgsm">
+									{% load static %}
+									<img src="{% static 'img/pressw.png' %}" width="80%"  alt="">
+								</div>
+
+								<div class="titlew">2,5</div>
+							</div>
+
+							<div class="status__column">
+								<div class="imgsm">
+									<img src="{% static 'img/potok.png' %}" width="80%"  alt="">
+								</div>
+								<div class="titlew">115</div>
+							</div>
+
+							<div class="status__column">
+								<div class="imgsm">
+									<img src="{% static 'img/tankf.png' %}" width="75%"  alt="">
+								</div>
+								<div class="titlew">ON</div>
+							</div>
+
+							<div class="status__column">
+								<div class="imgsm">
+									<img src="{% static 'img/measure.png' %}" width="80%"  alt="">
+								</div>
+								<div class="titlew">14° 25°</div>
+							</div>
+
+						</div> 
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlew">Esp: 1.9.3</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlew">And: site</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlew">Avr: 159</div>
+							</div>
+
+						</div> 
+					</div>
+
+				 </div>
+			  </div>
+
+			  <div class="page__element page__footer">
+				<div class="fcontent">
+					<a target="_blank" href="https://hi-garden.ru/" class="mhead__manual xhref">Контроллеры орошения</a>
+				</div>
+			  </div>
+			</div>
+	</div>
+</body>
+</html>
