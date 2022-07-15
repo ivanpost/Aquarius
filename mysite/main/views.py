@@ -1,9 +1,12 @@
+import django.db.models
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Controller, Channel, Program
+from .models import Controller, Channel, Program, UserExtension
 from operator import add
 from datetime import datetime, time, timedelta
 import time
+from ControllerManagers import ControllerV2Manager
+import json
 
 DAYS = {'monday': 'Понедельник',
         'tuesday': 'Вторник',
@@ -13,17 +16,51 @@ DAYS = {'monday': 'Понедельник',
         'saturday': 'Суббота',
         'sunday': 'Воскресенье'}
 
+@login_required
 def index(request):
-    return render(request, 'main/index.html',
-                  {
-                      'controllers': Controller.objects.all()
-                  })
+    try:
+        saved_controllers = request.user.userextension.saved_controllers
+    except:
+        uex = UserExtension(user=request.user, saved_controllers="[]")
+        uex.save()
+        saved_controllers = "[]"
+    if saved_controllers is None:
+        saved_controllers = []
+    else:
+        saved_controllers = json.loads(saved_controllers)
+    print(saved_controllers)
+    if request.method == "POST":
+        values = request.POST.dict()
+        if "user" in values.keys() and "password" in values.keys():
+            if ControllerV2Manager.check_auth(values["user"], values["password"]):
+                if ControllerV2Manager.add(values["user"], values["password"]):
+                    saved_controllers.append([values["user"], values["password"]])
 
+
+    controllers = []
+    _remove = []
+    for c in saved_controllers:
+        if ControllerV2Manager.check_auth(c[0], c[1]):
+            controllers.append(ControllerV2Manager.get_instance(c[0]).data_model)
+        else:
+            _remove.append(c)
+    [saved_controllers.remove(c) for c in _remove]
+    response = render(request, 'main/index.html',
+                    {
+                        'controllers': controllers
+                    })
+    request.user.userextension.saved_controllers = json.dumps(saved_controllers)
+    request.user.userextension.save()
+    return response
+
+@login_required
 def reports(request):
     return render(request, 'main/reports.html')
 
-
+@login_required
 def controller(request, prefix):
+    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+        return redirect("/")
     def get_day(start, l):
         out = []
         for i in range(24):
@@ -55,6 +92,11 @@ def controller(request, prefix):
 
         return out
 
+    print(prefix)
+    instance = ControllerV2Manager.get_instance(prefix)
+    if instance is not None:
+        instance.command_get_state()
+
     programs = Program.objects.filter(channel__controller__prefix=prefix)
     channels = Channel.objects.filter(controller__prefix=prefix)
     cont = Controller.objects.get(prefix=prefix)
@@ -76,7 +118,10 @@ def controller(request, prefix):
                       'day': list(DAYS.values())[cont.day-1]
                     })
 
+@login_required
 def controller_day(request, prefix, day):
+    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+        return redirect("/")
     def get_m(t):
         out = t // 2
         if t % 2 > 0:
@@ -125,7 +170,17 @@ def controller_day(request, prefix, day):
                       'lines_day': lines
                    })
 
+@login_required()
+def channels(request, prefix):
+    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+        return redirect("/")
+
+    channels = Channel.objects.filter(controller__prefix=prefix)
+
+@login_required
 def channel(request, prefix, chn):
+    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+        return redirect("/")
     def get_day(start, l):
         out = []
         for i in range(24):

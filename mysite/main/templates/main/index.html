@@ -4,12 +4,27 @@
 
 {% block content %}
 <h1>Главная страница</h1>
+<br>
 <h3>Контроллеры:</h3>
+<br>
+<form action="" method="post">
+    {% csrf_token %}
+    <label for="user">Пользователь: </label>
+    <input type="text" id="user" name="user"><br><br>
+    <label for="password">Пароль: </label>
+    <input type="password" id="password" name="password"><br><br>
+    <button type="submit" class="btn btn-primary" >Добавить</button>
+</form>
+<br>
+{% if controllers|length > 0 %}
 <ul>
     {% for cont in controllers %}
-        <li><a href="controllers/{{ cont.prefix }}">Контроллер {{ cont.prefix }}</a></li>
+    <li><a href="controllers/{{ cont.prefix }}">Контроллер {{ cont.prefix }}</a></li>
     {% endfor %}
 </ul>
+{% else %}
+Вы не добавили контроллеры
+{% endif %}
 <script>
     {% include 'includes/js_connect.html' %}
 </script>

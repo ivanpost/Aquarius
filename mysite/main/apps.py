@@ -1,7 +1,7 @@
 from MQTTManager import MQTTManager
 from django.apps import AppConfig
+from django.conf import settings
 from multiprocessing import Process
-from background_task import background
 
 class MainConfig(AppConfig):
     name = 'main'
@@ -12,9 +12,10 @@ class MainConfig(AppConfig):
 
     process = None
 
-
     def ready(self):
-        m = MQTTManager()
-        m.connect()
-        m.client.loop_start()
+        from main.models import Controller
+        from ControllerManagers import ControllerV2Manager
+        for c in Controller.objects.all():
+            ControllerV2Manager.add(c.prefix, c.password)
+
 

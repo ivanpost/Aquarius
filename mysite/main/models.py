@@ -1,8 +1,17 @@
 from django.db import models
 import datetime
+from django.contrib.auth.models import User
+
+
+class UserExtension(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    saved_controllers = models.CharField(max_length=100, default="[]")
+
 
 class Controller(models.Model):
-    prefix = models.CharField(max_length=30)
+    prefix = models.CharField(max_length=30, default="")
+    password = models.CharField(max_length=30, default="")
     time = models.TimeField(default=datetime.time(0, 0, 0), auto_now=False, auto_now_add=False)
     day = models.IntegerField(default=0)
     week = models.BooleanField(default=False)
@@ -32,6 +41,7 @@ class Controller(models.Model):
 
 class Channel(models.Model):
     id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=64, default="Канал")
     controller = models.ForeignKey('Controller', on_delete=models.CASCADE)
     state = models.BooleanField(default=False)
 

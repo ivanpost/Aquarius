@@ -16,6 +16,8 @@ class MQTTManager:
     client = None
     onConnected = None
     topicHandlers = {}
+    connected = False
+    trying = 2
 
     def __call__(self, *args, **kwargs):
         self.host = '185.134.36.37'
@@ -34,32 +36,40 @@ class MQTTManager:
     def on_disconnect(self, *args):
         self.client.on_message = lambda: True
 
+    def subscribe(self, topic, func):
+        self.topicHandlers[topic] = func
+        self.client.subscribe(self.prefix + topic)
+
+    def on_connected(self, client, userdata, flags, rc):
+        if self.trying > 0:
+            self.trying -= 1
+        else:
+            return False
+        if rc == 0:
+            print(f'MQTT: Connected to {self.user}@{self.host}:{self.port}')
+            # from main.models import Controller, Channel, Program
+            if self.onConnected is not None:
+                self.onConnected(self)
+            self.connected = True
+            self.trying = 0
+            return True
+        else:
+            self.connected = False
+            return False
 
     def connect(self):
         self.client = MQTT.Client()
-        self.topicHandlers["aqua_kontr"] = self.on_message_kontr
         self.client.username_pw_set(self.user, self.password)
         self.client.on_message = lambda cl, userdata, message: self.on_message(userdata, message)
-        if not self.onConnected == None: self.client.on_connect = lambda cl, ud, fl, rc: self.on_connected
-        self.client.on_connect = lambda cl, ud, fl, rc: self.on_disconnect
-        self.client.connect(self.host, port=self.port, keepalive=10)
-        print(f'MQTT: Connected to {self.user}@{self.host}:{self.port}')
-        print(self.topicHandlers)
-        for t in self.topicHandlers.keys():
-            self.client.subscribe(self.prefix + t)
-
-        print(f'MQTT: Subscribed to {", ".join([self.prefix + n for n in self.topicHandlers.keys()])}')
-        global Controller, Channel, Program
-        from main.models import Controller, Channel, Program
-        self.on_connected()
+        self.client.on_connect = self.on_connected
+        self.client.connect(self.host, port=self.port, keepalive=15)
+        self.client.loop_start()
+        while self.trying > 0:
+            pass
+        return self.connected
 
 
-
-    def on_connected(self):
-        self.send("aqua_smart", "1.2.3.4.3.2.1.8.8.8.8.8.8.8.8.8.8.0.80.9.8.7.6.7.8.9.9")
-
-
-    def on_message_kontr(self, message):
+    def on_message_kontr(self, mqtt, prefix, message):
         s = list(map(_int, message.split(".")))
         k = Controller.objects.all()[0]
         k.time = datetime.time(s[8], s[9], s[10])
@@ -97,28 +107,38 @@ class MQTTManager:
 
 
     def on_message(self, userdata, message):
-        print(f'MQTT - [{message.topic.replace(self.prefix, "")}] - {str(message.payload.decode("utf-8")).strip()}')
+        #print(f'MQTT - [{message.topic.replace(self.prefix, "")}] - {str(message.payload.decode("utf-8")).strip()}')
         if message.topic.replace(self.prefix, '') in self.topicHandlers.keys():
-            self.topicHandlers[message.topic.replace(self.prefix, "")](str(message.payload.decode("utf-8")).strip())
+            self.topicHandlers[message.topic.replace(self.prefix, "")](self, self.user, str(message.payload.decode("utf-8")).strip())
 
-    def __init__(self):
+    def __init__(self, user, password):
         self.host = '185.134.36.37'
         self.port = 18883
-        self.user = '221'
-        self.password = '183015864'
-        self.prefix = "221/"
+        #self.user = '2E8'
+        self.user = user
+        #self.password = '433987208'
+        self.password = password
+        self.prefix = f"{self.user}/"
 
-#m = MQTTManager()
-#m.connect()
+    @staticmethod
+    def try_connect(user: str, password: str):
+        try:
+            m = MQTTManager(user, password)
+            s = m.connect()
+            return m if s else None
+        except:
+            return None
 
+if __name__ == "__main__":
+    print(MQTTManager.try_connect("2E8", "433987208"))
 
-"""
-Prg: 
-1 - номер программы
-2 - дни недели (перевести в bin)
-3 - час
-4 - минута
-5 - резерв
-6 - время полива при мин температуре (мин)
-7 - время полива при макс температуре (мин)
-"""
+    while True:
+        pass
+
+    '''def on_connect(cl, ud, fl, rc):
+        print(rc)
+    client = MQTT.Client("mqtt-test")  # client ID "mqtt-test"
+    client.on_connect = on_connect
+    client.username_pw_set("2E8", "433987208")
+    client.connect('185.134.36.37', 18883)
+    client.loop_forever()'''
