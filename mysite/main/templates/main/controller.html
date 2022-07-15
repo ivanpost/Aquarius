@@ -9,10 +9,30 @@
 	<meta name="format-detection" content="telephone=no">
 	<title>Aquarius</title>
 	{% load static %}
-
 	<link rel="stylesheet" href="{% static 'css/controller.css' %}">
 </head>
 <body>
+<script type="text/javascript">
+		function set_channels(page)
+		{
+			for (var i = 0; i <= 2; i++)
+			{
+				if (i == page)
+				{
+					document.getElementById("chns_selector_" + i.toString()).className = "titlef onled11"
+				}
+				else
+				{
+					document.getElementById("chns_selector_" + i.toString()).className = "titlef onled01"
+				}
+			}
+			for (var i = 1; i <= 10; i++)
+			{
+				let pageOffset = page * 10
+				document.getElementById('chn' + i.toString()).innerHTML = "Канал "  + (pageOffset + i).toString();
+			}
+		}
+</script>
 	<div class="wrapper">
 
 		<div class="page">
@@ -36,7 +56,7 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlew">&#8986; &nbsp; &nbsp; 23:30</div>
+								<div class="titlew">&#8986; &nbsp; &nbsp; {{ cont.time|date:"G:i" }}</div>
 							</div>
 
 							<div class="status__column">
@@ -48,11 +68,11 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlew">MQTT - OK!</div>
+								<div class="titlew">MQTT - {% if cont.esp_mqtt %}ОК{% else %}Нет подключения{% endif %}!</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlew">&#9200; &nbsp; &nbsp; 23:40</div>
+								<div class="titlew">&#9200; &nbsp; &nbsp; {{ cont.nearest_time|date:"G:i" }}</div>
 							</div>
 							
 						</div>
@@ -97,24 +117,23 @@
 
 						<div class="status__row">
 							<div class="status__column">
-								<div class="titlef onled01">
-									<a onClick="javascript:chn_1_10();" role="button" href="#" class="myxhref">Каналы 1-10<br></a>
+								<div id="chns_selector_0" class="titlef onled11">
+									<a  onClick="javascript:set_channels(0);" role="button" href="#" class="myxhref">Каналы 1-10<br></a>
 									<div class="chnon">1, 7, 10</div>
 								</div>
-								
 							</div>
 
 							<div class="status__column">
-								<div class="titlef onled11">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Каналы 11-20<br></a>
+								<div id="chns_selector_1" class="titlef onled01">
+									<a onClick="javascript:set_channels(1);" role="button" href="#" class="myxhref">Каналы 11-20<br></a>
 									<div class="chnon">11, 14, 19</div>
 								</div>
 								
 							</div>
 
 							<div class="status__column">
-								<div class="titlef onled21">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Каналы 21-30<br></a>
+								<div id="chns_selector_2" class="titlef onled01">
+									<a onClick="javascript:set_channels(2);" role="button" href="#" class="myxhref">Каналы 21-30<br></a>
 									<div class="chnon">-</div>
 								</div>
 								
@@ -127,7 +146,7 @@
 
 							<div class="status__column">
 								<div class="titlev onled1">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 1</a>
+									<a id="chn1" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 1</a>
 									<div class="meandr mea1">_∏_∏_</div>
 								</div>
 								
@@ -135,21 +154,21 @@
 
 							<div class="status__column">
 								<div class="titlev onled2">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 2</a>
+									<a id="chn2" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 2</a>
 									<div class="meandr mea2">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev onled3">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 3</a>
+									<a id="chn3" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 3</a>
 									<div class="meandr mea3">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev onled4">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 4</a>
+									<a id="chn4" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 4</a>
 									<div class="meandr mea4">_∏_∏_</div>
 								</div>
 							</div>
@@ -160,28 +179,28 @@
 
 							<div class="status__column">
 								<div class="titlev onled5">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 5</a>
+									<a id="chn5" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 5</a>
 									<div class="meandr mea5">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev onled6">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 6</a>
+									<a id="chn6" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 6</a>
 									<div class="meandr mea6">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev onled7">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 7</a>
+									<a id="chn7" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 7</a>
 									<div class="meandr mea7">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev onled8">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 8</a>
+									<a id="chn8" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 8</a>
 									<div class="meandr mea8">_∏_∏_</div>
 								</div>
 							</div>
@@ -200,14 +219,14 @@
 
 							<div class="status__column">
 								<div class="titlev onled9">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 9</a>
+									<a id="chn9" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 9</a>
 									<div class="meandr mea9">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev onled10">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 10</a>
+									<a id="chn10" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 10</a>
 									<div class="meandr mea10">_∏_∏_</div>
 								</div>
 							</div>
@@ -238,7 +257,7 @@
 								<div class="imgsm">
 									<img src="{% static 'img/potok.png' %}" width="80%"  alt="">
 								</div>
-								<div class="titlew">115</div>
+								<div class="titlew">{{ cont.pressure }}</div>
 							</div>
 
 							<div class="status__column">
@@ -252,7 +271,7 @@
 								<div class="imgsm">
 									<img src="{% static 'img/measure.png' %}" width="80%"  alt="">
 								</div>
-								<div class="titlew">14° 25°</div>
+								<div class="titlew">{{ cont.t1 }}° {{ cont.t2 }}°</div>
 							</div>
 
 						</div> 
@@ -260,7 +279,7 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlew">Esp: 1.9.3</div>
+								<div class="titlew">Esp: {{ cont.esp_v }}</div>
 							</div>
 
 							<div class="status__column">
@@ -284,5 +303,8 @@
 			  </div>
 			</div>
 	</div>
+		<script type="text/javascript">
+			set_channels(0);
+		</script>
 </body>
 </html>

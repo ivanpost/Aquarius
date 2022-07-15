@@ -96,6 +96,7 @@ def controller(request, prefix):
     instance = ControllerV2Manager.get_instance(prefix)
     if instance is not None:
         instance.command_get_state()
+        instance.command_get_channels()
 
     programs = Program.objects.filter(channel__controller__prefix=prefix)
     channels = Channel.objects.filter(controller__prefix=prefix)

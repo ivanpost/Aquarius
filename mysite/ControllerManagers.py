@@ -47,7 +47,6 @@ class ControllerV2Manager:
         else:
             return True
 
-
     @staticmethod
     def check_auth(prefix: str = "", password: str = "", user: User = None) -> bool:
         if user is not None:
@@ -100,7 +99,7 @@ class ControllerV2Manager:
         self.send_command("0.0.8")
 
     def command_get_channels_response(self, data, **kwargs) -> bool:
-        print(data)
+        print(kwargs["old_data"])
         s = list(map(try_int, data.split(".")))
         [print(f"{num}: {i}") for num, i in enumerate(s)]
         return False
