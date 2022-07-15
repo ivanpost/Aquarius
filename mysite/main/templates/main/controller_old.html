@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}{{ prefix }}{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<script type="text/javascript">
+        function chn_1_10() {
+            document.getElementById('chn1').innerHTML = "Канал<br>1";
+            document.getElementById('chn2').innerHTML = "Канал<br>2";
+            document.getElementById('chn3').innerHTML = "Канал<br>3";
+            document.getElementById('chn4').innerHTML = "Канал<br>4";
+            document.getElementById('chn5').innerHTML = "Канал<br>5";
+            document.getElementById('chn6').innerHTML = "Канал<br>6";
+            document.getElementById('chn7').innerHTML = "Канал<br>7";
+            document.getElementById('chn8').innerHTML = "Канал<br>8";
+            document.getElementById('chn9').innerHTML = "Канал<br>9";
+            document.getElementById('chn10').innerHTML = "Канал<br>10";
+        }
+
+        function chn_11_20() {
+            document.getElementById('chn1').innerHTML = "Канал<br>11";
+            document.getElementById('chn2').innerHTML = "Канал<br>12";
+            document.getElementById('chn3').innerHTML = "Канал<br>13";
+            document.getElementById('chn4').innerHTML = "Канал<br>14";
+            document.getElementById('chn5').innerHTML = "Канал<br>15";
+            document.getElementById('chn6').innerHTML = "Канал<br>16";
+            document.getElementById('chn7').innerHTML = "Канал<br>17";
+            document.getElementById('chn8').innerHTML = "Канал<br>18";
+            document.getElementById('chn9').innerHTML = "Канал<br>19";
+            document.getElementById('chn10').innerHTML = "Канал<br>20";
+        }
+
+        function chn_21_30() {
+            document.getElementById('chn1').innerHTML = "Канал<br>21";
+            document.getElementById('chn2').innerHTML = "Канал<br>22";
+            document.getElementById('chn3').innerHTML = "Канал<br>23";
+            document.getElementById('chn4').innerHTML = "Канал<br>24";
+            document.getElementById('chn5').innerHTML = "Канал<br>25";
+            document.getElementById('chn6').innerHTML = "Канал<br>26";
+            document.getElementById('chn7').innerHTML = "Канал<br>27";
+            document.getElementById('chn8').innerHTML = "Канал<br>28";
+            document.getElementById('chn9').innerHTML = "Канал<br>29";
+            document.getElementById('chn10').innerHTML = "Канал<br>30";
+        }
+    </script>
+<h1>Контроллер {{ prefix }}</h1>
+<hr>
+<br>
+<div class="row">
+    <div class="col-12 col-md-3">
+        <div class="d-flex justify-content-center">
+            <div class="">
+                <a href="#" role="button" class="btn btn-success btn-lg btn-block">Каналы</a>
+                <a href="#" role="button" class="btn btn-success btn-lg btn-block">Ручное</a>
+                <a href="#" role="button" class="btn btn-success btn-lg btn-block">Пауза</a>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+<div class="row">
+    <div class="col-12 col-md-3">
+        <div class="d-flex justify-content-center">
+            <div class="">
+                <button onClick="javascript:chn_1_10();" type="button" class="btn btn-success btn-lg btn-block">1-10<br>1, 7, 10</button>
+                <a onClick="javascript:chn_11_20();" href="#" role="button" class="btn btn-success btn-lg btn-block">11-20<br>11, 14, 19</a>
+                <a onClick="javascript:chn_21_30();" href="#" role="button" class="btn btn-success btn-lg btn-block">21-30<br>-</a>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+<div class="row">
+    <div class="col-12 col-md-3">
+        <div class="d-flex justify-content-center">
+            <div class="">
+                <a id="chn1" href="#" role="button" class="btn btn-success btn-block">Канал<br>1</a>
+                <a id="chn2" href="#" role="button" class="btn btn-success btn-block">Канал<br>2</a>
+                <a id="chn3" href="#" role="button" class="btn btn-success btn-block">Канал<br>3</a>
+                <a id="chn4" href="#" role="button" class="btn btn-success btn-block">Канал<br>4</a>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+<div class="row">
+    <div class="col-12 col-md-3">
+        <div class="d-flex justify-content-center">
+            <div class="">
+                <a id="chn5" href="#" role="button" class="btn btn-success btn-block">Канал<br>5</a>
+                <a id="chn6" href="#" role="button" class="btn btn-success btn-block">Канал<br>6</a>
+                <a id="chn7" href="#" role="button" class="btn btn-success btn-block">Канал<br>7</a>
+                <a id="chn8" href="#" role="button" class="btn btn-success btn-block">Канал<br>8</a>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+<div class="row">
+    <div class="col-12 col-md-3">
+        <div class="d-flex justify-content-center">
+            <div class="">
+                <a href="#" role="button" class="btn btn-success btn-block">Влажность<br>37% 64%</a>
+                <a id="chn9" href="#" role="button" class="btn btn-success btn-block">Канал<br>9</a>
+                <a id="chn10" href="#" role="button" class="btn btn-success btn-block">Канал<br>10</a>
+                <a href="#" role="button" class="btn btn-success btn-block">Насос<br>1</a>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+<div class="row">
+    <div class="col-12 col-md-3">
+        <div class="d-flex justify-content-center">
+            <div class="">
+                <a href="#" role="button" class="btn btn-success btn-block">Давление<br>{{ cont.pressure }}</a>
+                <a href="#" role="button" class="btn btn-success btn-block">Поток<br>{{ cont.stream }}</a>
+                <a href="#" role="button" class="btn btn-success btn-block">Уровень<br>1</a>
+                <a href="#" role="button" class="btn btn-success btn-block">Темп<br>{{ cont.t1 }} {{ cont.t2 }}</a>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+    <!--
+<label>Неделя: {% if cont.week %} Четная {% else %} Нечетная {% endif %}</label><br>
+<label>День недели: {{ day }}</label><br>
+<label>Время: {{ cont.time|date:"G:i" }}</label><br>
+<label>Следующее включение: {{ cont.nearest_time|date:"G:i" }}</label><br>
+<label>Температура №1: {{ cont.t1 }}</label><br>
+<label>Температура №2: {{ cont.t2 }}</label><br>
+<label>Давление: {{ cont.pressure }}</label><br>
+<label>Поток: {{ cont.stream }} л/мин</label><br>
+<label>Датчик дождя:
+    {% if cont.rain %} <span  style="color: green">Активен</span>
+    {% else %} <span  style="color: red">Неактивен</span>  {% endif %}
+</label><br>
+<label>Пауза в поливе:
+    {% if cont.pause %} <span  style="color: green">Включена</span>
+    {% else %} <span  style="color: red">Выключена</span>  {% endif %}
+</label><br>
+<br>
+<label>Номер контроллера: {{ cont.num }}</label><br>
+<label>IP: {{ cont.ip }}</label><br>
+<label>Версия прошивки контроллера: {{ cont.version }}</label><br>
+<label>Версия прошивки ESP: {{ cont.esp_v }}</label><br>
+<label>Подключение к точке доступа:
+    {% if cont.esp_connected %} <span  style="color: green">Подключено</span>
+    {% else %} <span  style="color: red">Нет подключения</span>  {% endif %}
+</label><br>
+<label>Статус AP:
+    {% if cont.esp_ap %} <span  style="color: green">Открыта</span>
+    {% else %} <span  style="color: red">Закрыта</span>  {% endif %}
+</label><br>
+<label>Подключение к MQTT:
+    {% if cont.esp_mqtt %} <span  style="color: green">Подключено</span>
+    {% else %} <span  style="color: red">Нет подключения</span>  {% endif %}
+</label><br>
+<hr>
+
+<h3>График включений</h3>
+<br>
+<table style="border-collapse:collapse;">
+    <colgroup>
+        <col>
+        <col span="7">
+    </colgroup>
+    <thead class="graph-header">
+        <tr class="graph">
+            <th>Номер канала</th>
+            <th>Статус</th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/monday">Понедельник</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/tuesday">Вторник</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/wednesday">Среда</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/thursday">Четверг</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/friday">Пятница</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/saturday">Суббота</a></th>
+            <th colspan="24" style="width: 13%; text-align: center;"><a href="{{prefix}}/sunday">Воскресенье</a></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for line in lines_week %}
+            <tr {% if forloop.last %} style="border-bottom: 2px solid gray" {% endif %}>
+                <th><a href="{% url 'channel' prefix forloop.counter %}">Канал {{ forloop.counter }}</a></th>
+                {% if line.status %}
+                <th class="graph-left" style="background: #5d8a4d;"> Вкл </th>
+                {% else %}
+                <th class="graph-left" style="background: #c25642;"> Выкл </th>
+                {% endif %}
+                {% for week in line.data %}
+                    {% for h in week %}
+                        {% if forloop.first %}
+                            <th class="graph-left" {% if h == 1 %} style="background: green; " {% endif %}></th>
+                        {% elif forloop.last %}
+                            <th class="graph-right" {% if h == 1 %} style="background: green;" {% endif %}></th>
+                        {% else %}
+                            <th {% if h == 1 %} style="background: green;"{% endif %}></th>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<br>
+<br>
+{% endblock %}
+-->

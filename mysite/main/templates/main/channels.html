@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Настройка каналов{% endblock %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ prefix }} / Каналы</h1>
+<hr>
+<form action="" method="post">
+    {% csrf_token %}
+    {% for chn in channels %}
+        <input type="text" id="chn_{{ forloop.counter }}" name="chn_{{ forloop.counter }}">
+    {% endfor %}
+</form>
+
