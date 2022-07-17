@@ -1,5 +1,6 @@
 from MQTTManager import MQTTManager
 from main.models import Controller, Channel, UserExtension
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import datetime
 from bitstring import BitArray
 from django.contrib.auth.models import User
@@ -75,6 +76,15 @@ class ControllerV2Manager:
             self.data_model = Controller(prefix=controller_prefix, password=password)
             self.data_model.save()
 
+        for channel_num in range(1, 31):
+            try:
+                channel = Channel.objects.get(controller=self.data_model, number=channel_num)
+            except ObjectDoesNotExist:
+                channel = Channel(controller=self.data_model, number=channel_num)
+                channel.save()
+            except MultipleObjectsReturned:
+                Channel.objects.filter(controller=self.data_model, number=channel_num).delete()
+
         self.mqtt_manager = mqtt_manager
         self.prefix = controller_prefix
         self.command_response_handlers = {
@@ -95,24 +105,27 @@ class ControllerV2Manager:
     def wrap_command(self, request_code: str, payload: str) -> str:
         return self.cmd_pattern.format(request_code=request_code, payload=payload, check_sum=self.get_check_sum(payload))
 
+
     def command_get_channels(self) -> None:
         self.send_command("0.0.8")
 
     def command_get_channels_response(self, data, **kwargs) -> bool:
-        print(kwargs["old_data"])
-        s = list(map(try_int, data.split(".")))
-        [print(f"{num}: {i}") for num, i in enumerate(s)]
-        return False
+        parsed_message = list(map(try_int, data.split(".")))
+        for i in parsed_message[7:11]:
+            for j in list(BitArray(uint=i, length=8)):
+                pass
+        return True
 
     def command_get_state(self) -> None:
         self.send_command("8.8.8.8.8.8.8.8")
 
     def command_get_state_response(self, data, **kwargs) -> bool:
+        print("Receive")
         try:
             data = kwargs["old_data"]
             #print(f"Message: {data}")
             s = list(map(try_int, data.split(".")))
-            #[print(f"{num}: {i}") for num, i in enumerate(s)]
+            [print(f"{num}: {i}") for num, i in enumerate(s)]
             self.data_model.time = datetime.time(s[8], s[9], s[10])
             self.data_model.day = s[11]
             self.data_model.week = bool(s[21])
@@ -139,22 +152,26 @@ class ControllerV2Manager:
             self.data_model.stream = s[37]
             self.data_model.num = f"{s[39]}-{s[40]}"
 
-            db_chns = Channel.objects.all()
-            chns = list(BitArray(uint=s[15], length=8)) + list(BitArray(uint=s[16], length=8)) + list(
-                BitArray(uint=s[17], length=8)) + list(BitArray(uint=s[18], length=8))
-            for c in db_chns:
-                s = chns[c.id - 1]
-                if c.state != s:
-                    c.state = s
-                    c.save()
+            db_chns = {i.number: i for i in Channel.objects.filter(controller=self.data_model)}
+            chns = list(list(BitArray(uint=s[15], length=8)))[::-1] + list(BitArray(uint=s[16], length=8))[::-1] + list(
+                BitArray(uint=s[17], length=8))[::-1] + list(BitArray(uint=s[18], length=8)[::-1])
+            print("Channels:", chns)
+            for c in db_chns.keys():
+                print(c)
+                if c < len(chns):
+                    s = chns[db_chns[c].number-1]
+                    print("S:", s)
+                    if db_chns[c].state != s:
+                        db_chns[c].state = s
+                        print("Save")
+                        db_chns[c].save()
             self.data_model.save()
             return True
         except:
             return False
 
     def on_connected(self, mqtt: MQTTManager):
-        #self.command_get_state()
-        self.command_get_channels()
+        self.command_get_state()
 
     def get_check_sum(self, data: str) -> (int, int):
         bytes = sum(list(data.encode("ascii"))).to_bytes(2, "little")

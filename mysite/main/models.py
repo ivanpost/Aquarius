@@ -41,12 +41,13 @@ class Controller(models.Model):
 
 class Channel(models.Model):
     id = models.AutoField(primary_key=True)
+    number = models.IntegerField(default=1)
     name = models.CharField(max_length=64, default="Канал")
     controller = models.ForeignKey('Controller', on_delete=models.CASCADE)
     state = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.controller.prefix} / {self.id}"
+        return f"{self.controller.prefix} / {self.number}"
 
 
 class Program(models.Model):

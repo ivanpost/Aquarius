@@ -92,11 +92,9 @@ def controller(request, prefix):
 
         return out
 
-    print(prefix)
     instance = ControllerV2Manager.get_instance(prefix)
     if instance is not None:
         instance.command_get_state()
-        instance.command_get_channels()
 
     programs = Program.objects.filter(channel__controller__prefix=prefix)
     channels = Channel.objects.filter(controller__prefix=prefix)
@@ -116,7 +114,8 @@ def controller(request, prefix):
                       'prefix': prefix,
                       'lines_week': lines,
                       'cont': cont,
-                      'day': list(DAYS.values())[cont.day-1]
+                      'day': list(DAYS.values())[cont.day-1],
+                      'channels_state_json': json.dumps([i.status for i in lines])
                     })
 
 @login_required

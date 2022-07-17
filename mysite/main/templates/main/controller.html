@@ -13,6 +13,9 @@
 </head>
 <body>
 <script type="text/javascript">
+		var channels_state_json = "{{ channels_state_json }}";
+		var channels_state = JSON.parse(channels_state_json);
+
 		function set_channels(page)
 		{
 			for (var i = 0; i <= 2; i++)
@@ -28,8 +31,20 @@
 			}
 			for (var i = 1; i <= 10; i++)
 			{
-				let pageOffset = page * 10
-				document.getElementById('chn' + i.toString()).innerHTML = "Канал "  + (pageOffset + i).toString();
+				let channel_number = page * 10 + i;
+				document.getElementById('chn' + i.toString()).innerHTML = "Канал "  + channel_number.toString();
+
+				if (channel_number < channels_state.length)
+				{
+					var className = "titlev onled2"
+
+					if (channels_state[channel_number - 1])
+					{
+						className = "titlev onled1"
+					}
+
+					document.getElementById('chn' + i.toString() + "_div").className = className;
+				}
 			}
 		}
 </script>
@@ -145,7 +160,7 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlev onled1">
+								<div id="chn1_div" class="titlev onled1">
 									<a id="chn1" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 1</a>
 									<div class="meandr mea1">_∏_∏_</div>
 								</div>
@@ -153,21 +168,21 @@
 							</div>
 
 							<div class="status__column">
-								<div class="titlev onled2">
+								<div id="chn2_div" class="titlev onled2">
 									<a id="chn2" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 2</a>
 									<div class="meandr mea2">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlev onled3">
+								<div id="chn3_div" class="titlev onled3">
 									<a id="chn3" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 3</a>
 									<div class="meandr mea3">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlev onled4">
+								<div id="chn4_div" class="titlev onled4">
 									<a id="chn4" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 4</a>
 									<div class="meandr mea4">_∏_∏_</div>
 								</div>
@@ -178,28 +193,28 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlev onled5">
+								<div id="chn5_div" class="titlev onled5">
 									<a id="chn5" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 5</a>
 									<div class="meandr mea5">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlev onled6">
+								<div id="chn6_div" class="titlev onled6">
 									<a id="chn6" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 6</a>
 									<div class="meandr mea6">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlev onled7">
+								<div id="chn7_div" class="titlev onled7">
 									<a id="chn7" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 7</a>
 									<div class="meandr mea7">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlev onled8">
+								<div id="chn8_div" class="titlev onled8">
 									<a id="chn8" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 8</a>
 									<div class="meandr mea8">_∏_∏_</div>
 								</div>
@@ -218,14 +233,14 @@
 							</div>
 
 							<div class="status__column">
-								<div class="titlev onled9">
+								<div id="chn9_div" class="titlev onled9">
 									<a id="chn9" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 9</a>
 									<div class="meandr mea9">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlev onled10">
+								<div id="chn10_div" class="titlev onled10">
 									<a id="chn10" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 10</a>
 									<div class="meandr mea10">_∏_∏_</div>
 								</div>
