@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -7,49 +8,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0">
 	<meta name="format-detection" content="telephone=no">
 	<title>Aquarius</title>
-	<!--<link rel="stylesheet" href="css/style.css">-->
 	{% load static %}
-	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+	<link rel="stylesheet" href="{% static 'css/controller.css' %}">
 </head>
 <body>
 <script type="text/javascript">
 		var channels_state_json = "{{ channels_state_json }}";
 		var channels_state = JSON.parse(channels_state_json);
-
-		function set_channels(page)
-		{
-			for (var i = 0; i <= 2; i++)
-			{
-				if (i == page)
-				{
-					document.getElementById("chns_selector_" + i.toString()).className = "titlef folderon"
-				}
-				else
-				{
-					document.getElementById("chns_selector_" + i.toString()).className = "titlef folderoff"
-				}
-			}
-			for (var i = 1; i <= 10; i++)
-			{
-				let channel_number = page * 10 + i;
-				document.getElementById('chn' + i.toString()).innerHTML = "Канал "  + channel_number.toString();
-
-				if (channel_number < channels_state.length)
-				{
-					var className = "titlev channeloff";
-					var classNameMeandr = "meandroff";
-
-					if (channels_state[channel_number - 1])
-					{
-						className = "titlev channelon";
-						classNameMeandr = "meandron";
-					}
-
-					document.getElementById('chn' + i.toString() + "_div").className = className;
-					document.getElementById('chn' + i.toString() + "_meandr").className = classNameMeandr;
-				}
-			}
-		}
 
 		function set_channels_status()
 		{
@@ -73,6 +38,39 @@
 				}
 
 				document.getElementById("chns_selector_" + i.toString() + "_status").innerHTML = active_channels_str;
+			}
+		}
+
+		function set_channels(page)
+		{
+			for (var i = 0; i <= 2; i++)
+			{
+				if (i == page)
+				{
+					document.getElementById("chns_selector_" + i.toString()).className = "titlef onled11"
+				}
+				else
+				{
+					document.getElementById("chns_selector_" + i.toString()).className = "titlef onled01"
+				}
+			}
+
+			for (var i = 1; i <= 10; i++)
+			{
+				let channel_number = page * 10 + i;
+				document.getElementById('chn' + i.toString()).innerHTML = "Канал "  + channel_number.toString();
+
+				if (channel_number < channels_state.length)
+				{
+					var className = "titlev onled2"
+
+					if (channels_state[channel_number - 1])
+					{
+						className = "titlev onled1"
+					}
+
+					document.getElementById('chn' + i.toString() + "_div").className = className;
+				}
 			}
 		}
 </script>
@@ -160,14 +158,14 @@
 
 						<div class="status__row">
 							<div class="status__column">
-								<div id="chns_selector_0" class="titlef folderon">
+								<div id="chns_selector_0" class="titlef onled11">
 									<a  onClick="javascript:set_channels(0);" role="button" href="#" class="myxhref">Каналы 1-10<br></a>
 									<div id="chns_selector_0_status" class="chnon">1, 7, 10</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div id="chns_selector_1" class="titlef folderoff">
+								<div id="chns_selector_1" class="titlef onled01">
 									<a onClick="javascript:set_channels(1);" role="button" href="#" class="myxhref">Каналы 11-20<br></a>
 									<div id="chns_selector_1_status" class="chnon">11, 14, 19</div>
 								</div>
@@ -175,7 +173,7 @@
 							</div>
 
 							<div class="status__column">
-								<div id="chns_selector_2" class="titlef folderoff">
+								<div id="chns_selector_2" class="titlef onled01">
 									<a onClick="javascript:set_channels(2);" role="button" href="#" class="myxhref">Каналы 21-30<br></a>
 									<div id="chns_selector_2_status" class="chnon">-</div>
 								</div>
@@ -188,31 +186,31 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div id="chn1_div" class="titlev channelon">
+								<div id="chn1_div" class="titlev onled1">
 									<a id="chn1" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 1</a>
-									<div id="chn1_meandr" class="meandron">_∏_∏_</div>
+									<div class="meandr mea1">_∏_∏_</div>
 								</div>
 								
 							</div>
 
 							<div class="status__column">
-								<div id="chn2_div" class="titlev channeloff">
+								<div id="chn2_div" class="titlev onled2">
 									<a id="chn2" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 2</a>
-									<div id="chn2_meandr" class="meandroff">_∏_∏_</div>
+									<div class="meandr mea2">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div id="chn3_div" class="titlev channeloff">
+								<div id="chn3_div" class="titlev onled3">
 									<a id="chn3" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 3</a>
-									<div id="chn3_meandr" class="meandroff">_∏_∏_</div>
+									<div class="meandr mea3">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div id="chn4_div" class="titlev channeloff">
+								<div id="chn4_div" class="titlev onled4">
 									<a id="chn4" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 4</a>
-									<div id="chn4_meandr" class="meandroff">_∏_∏_</div>
+									<div class="meandr mea4">_∏_∏_</div>
 								</div>
 							</div>
 
@@ -221,30 +219,30 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div id="chn5_div" class="titlev channeloff">
+								<div id="chn5_div" class="titlev onled5">
 									<a id="chn5" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 5</a>
-									<div id="chn5_meandr" class="meandroff">_∏_∏_</div>
+									<div class="meandr mea5">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div id="chn6_div" class="titlev channeloff">
+								<div id="chn6_div" class="titlev onled6">
 									<a id="chn6" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 6</a>
-									<div id="chn6_meandr" class="meandroff">_∏_∏_</div>
+									<div class="meandr mea6">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div id="chn7_div" class="titlev channeloff">
+								<div id="chn7_div" class="titlev onled7">
 									<a id="chn7" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 7</a>
-									<div id="chn7_meandr" class="meandroff">_∏_∏_</div>
+									<div class="meandr mea7">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div id="chn8_div" class="titlev channeloff">
+								<div id="chn8_div" class="titlev onled8">
 									<a id="chn8" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 8</a>
-									<div id="chn8_meandr" class="meandroff">_∏_∏_</div>
+									<div class="meandr mea8">_∏_∏_</div>
 								</div>
 							</div>
 
@@ -255,29 +253,29 @@
 							<div class="status__column">
 								<div class="titlev onledw">
 									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Влажность</a>
-									<div class="meandron">45%</div>	
+									<div class="chnon">45%</div>	
 								</div>
 								
 							</div>
 
 							<div class="status__column">
-								<div id="chn9_div" class="titlev channeloff">
+								<div id="chn9_div" class="titlev onled9">
 									<a id="chn9" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 9</a>
-									<div id="chn9_meandr" class="meandroff">_∏_∏_</div>
+									<div class="meandr mea9">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div id="chn10_div" class="titlev channeloff">
+								<div id="chn10_div" class="titlev onled10">
 									<a id="chn10" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 10</a>
-									<div id="chn10_meandr" class="meandroff">_∏_∏_</div>
+									<div class="meandr mea10">_∏_∏_</div>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlev channeloff">
+								<div class="titlev onledp">
 									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Насос</a>
-									<div class="meandroff">&nbsp;</div>
+									<div class="chnon">ON</div>
 								</div>
 								
 							</div>
@@ -347,8 +345,8 @@
 			</div>
 	</div>
 		<script type="text/javascript">
-			set_channels(0);
 			set_channels_status();
+			set_channels(0);
 		</script>
 </body>
 </html>
