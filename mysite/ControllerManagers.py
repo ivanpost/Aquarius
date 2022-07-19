@@ -5,6 +5,7 @@ import datetime
 from bitstring import BitArray
 from django.contrib.auth.models import User
 import json
+from typing import List
 def try_int(i):
     try:
         return int(i)
@@ -16,7 +17,7 @@ class ControllerV2Manager:
 
     instances = {}
 
-    cmd_pattern = "1.2.3.4.3.2.1.{request_code}.{payload}.{check_sum[0]}.{check_sum[1]}.9.8.7.6.7.8.9"
+    cmd_pattern = ".1.2.3.4.3.2.1.{request_code}.{payload}.{check_sum[0]}.{check_sum[1]}.9.8.7.6.7.8.9.9."
     topic_send = "aqua_smart"
     topic_receive = "aqua_kontr"
 
@@ -103,8 +104,26 @@ class ControllerV2Manager:
         self.mqtt_manager.send(self.topic_send, msg)
 
     def wrap_command(self, request_code: str, payload: str) -> str:
-        return self.cmd_pattern.format(request_code=request_code, payload=payload, check_sum=self.get_check_sum(payload))
+        return self.cmd_pattern.format(request_code=request_code, payload=payload,
+                                       check_sum=self.get_check_sum(request_code, payload))
 
+    def command_turn_on_channel(self, channel_num, seconds) -> None:
+        #app: .1.2.3.4.3.2.1.0.0.2.3.0.3.0.8.9.8.7.6.7.8.9.9.
+        #my:  .1.2.3.4.3.2.1.0.0.2.3.0.3.0.11.9.8.7.6.7.8.9.9.
+
+        #my_new:  .1.2.3.4.3.2.1.0.0.2.3.0.3.0.8.9.8.7.6.7.8.9.9.
+        #app_new: .1.2.3.4.3.2.1.0.0.2.3.0.3.0.8.9.8.7.6.7.8.9.9.
+
+        #.1.2.3.4.3.2.1.0.0.2.3.0.10.0.15.9.8.7.6.7.8.9.9.
+        seconds_bytes = seconds.to_bytes(2, "big")
+        self.send_command("0.0.2", f"{channel_num}.{seconds_bytes[0]}.{seconds_bytes[1]}")
+
+    def command_turn_on_channel_response(self, data, **kwargs) -> bool:
+        parsed_message = list(map(try_int, data.split(".")))
+        for i in parsed_message[7:11]:
+            for j in list(BitArray(uint=i, length=8)):
+                pass
+        return True
 
     def command_get_channels(self) -> None:
         self.send_command("0.0.8")
@@ -120,12 +139,10 @@ class ControllerV2Manager:
         self.send_command("8.8.8.8.8.8.8.8")
 
     def command_get_state_response(self, data, **kwargs) -> bool:
-        print("Receive")
         try:
             data = kwargs["old_data"]
-            #print(f"Message: {data}")
             s = list(map(try_int, data.split(".")))
-            [print(f"{num}: {i}") for num, i in enumerate(s)]
+            #[print(f"{num}: {i}") for num, i in enumerate(s)]
             self.data_model.time = datetime.time(s[8], s[9], s[10])
             self.data_model.day = s[11]
             self.data_model.week = bool(s[21])
@@ -152,30 +169,33 @@ class ControllerV2Manager:
             self.data_model.stream = s[37]
             self.data_model.num = f"{s[39]}-{s[40]}"
 
+
             db_chns = {i.number: i for i in Channel.objects.filter(controller=self.data_model)}
             chns = list(list(BitArray(uint=s[15], length=8)))[::-1] + list(BitArray(uint=s[16], length=8))[::-1] + list(
                 BitArray(uint=s[17], length=8))[::-1] + list(BitArray(uint=s[18], length=8)[::-1])
-            print("Channels:", chns)
             for c in db_chns.keys():
-                print(c)
                 if c < len(chns):
                     s = chns[db_chns[c].number-1]
-                    print("S:", s)
                     if db_chns[c].state != s:
                         db_chns[c].state = s
-                        print("Save")
                         db_chns[c].save()
             self.data_model.save()
-            return True
-        except:
             return False
+        except:
+            return True
 
     def on_connected(self, mqtt: MQTTManager):
         self.command_get_state()
 
-    def get_check_sum(self, data: str) -> (int, int):
-        bytes = sum(list(data.encode("ascii"))).to_bytes(2, "little")
-        return bytes[0], bytes[1]
+    def get_check_sum(self, *data: str) -> (int, int):
+        check_sum = 0
+        for d in data:
+            for i in d.split("."):
+                if i.isdigit():
+                    check_sum += int(i)
+        check_sum_bytes = check_sum.to_bytes(2, "big")
+        return check_sum_bytes[0], check_sum_bytes[1]
+        return 0, 8
 
     def handle_message(self, mqtt: MQTTManager, controller_prefix: str, data: str) -> None:
         if self.last_command in self.command_response_handlers.keys():

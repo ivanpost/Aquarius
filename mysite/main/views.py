@@ -28,7 +28,6 @@ def index(request):
         saved_controllers = []
     else:
         saved_controllers = json.loads(saved_controllers)
-    print(saved_controllers)
     if request.method == "POST":
         values = request.POST.dict()
         if "user" in values.keys() and "password" in values.keys():
