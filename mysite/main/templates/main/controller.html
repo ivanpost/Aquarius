@@ -50,6 +50,31 @@
 				}
 			}
 		}
+
+		function set_channels_status()
+		{
+			for (var i = 0; i <= 2; i++)
+			{
+				var active_channels = [];
+				for (var j = 1; j <= 10; j++)
+				{
+					let channel_number = i * 10 + j;
+
+					if (channels_state[channel_number - 1])
+					{
+						active_channels.push(channel_number.toString());
+					}
+
+				}
+				var active_channels_str = active_channels.join(", ")
+				if (active_channels_str == "")
+				{
+					active_channels_str = "-"
+				}
+
+				document.getElementById("chns_selector_" + i.toString() + "_status").innerHTML = active_channels_str;
+			}
+		}
 </script>
 	<div class="wrapper">
 
@@ -137,14 +162,14 @@
 							<div class="status__column">
 								<div id="chns_selector_0" class="titlef folderon">
 									<a  onClick="javascript:set_channels(0);" role="button" href="#" class="myxhref">Каналы 1-10<br></a>
-									<div class="chnon">1, 7, 10</div>
+									<div id="chns_selector_0_status" class="chnon">1, 7, 10</div>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div id="chns_selector_1" class="titlef folderoff">
 									<a onClick="javascript:set_channels(1);" role="button" href="#" class="myxhref">Каналы 11-20<br></a>
-									<div class="chnon">11, 14, 19</div>
+									<div id="chns_selector_1_status" class="chnon">11, 14, 19</div>
 								</div>
 								
 							</div>
@@ -152,7 +177,7 @@
 							<div class="status__column">
 								<div id="chns_selector_2" class="titlef folderoff">
 									<a onClick="javascript:set_channels(2);" role="button" href="#" class="myxhref">Каналы 21-30<br></a>
-									<div class="chnon">-</div>
+									<div id="chns_selector_2_status" class="chnon">-</div>
 								</div>
 								
 							</div>
@@ -323,6 +348,7 @@
 	</div>
 		<script type="text/javascript">
 			set_channels(0);
+			set_channels_status();
 		</script>
 </body>
 </html>
