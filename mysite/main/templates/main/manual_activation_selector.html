@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,12 +5,20 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0">
 	<meta name="format-detection" content="telephone=no">
-	<title>Aquarius</title>
+	<title>Ручное включение</title>
 	<!--<link rel="stylesheet" href="css/style.css">-->
 	{% load static %}
 	<link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 {% include "includes/channels_selector_script.html" %}
+<script type="text/javascript">
+	var pattern = "{% url 'manual_activation' prefix '-to_replace-' %}"
+	function redirect_to_channel(num)
+	{
+		let channel_num = current_page * 10 + num;
+		window.location.replace(pattern.replace("-to_replace-", channel_num.toString()));
+	}
+</script>
 <body>
 	<div class="wrapper">
 
@@ -21,10 +28,10 @@
 				<div class="page__element page__head">
 				 <div class="mhead">
 					<a target="_blank" href="https://hi-garden.ru/" class="mhead__logo xhref">Hi-Garden</a>
-					<div class="mhead__title">Aquarius Main</Main></div>
-					<a target="_blank" href="https://hi-garden.ru/aqua2-manual" class="mhead__manual xhref">Menu</a>
+					<div class="mhead__title">Aquarius Hand</Main></div>
+					<a target="_blank" href="https://hi-garden.ru/aqua2-manual" class="mhead__manual xhref">Menu</a>		 
 				 </div>
-
+			
 				</div>
 
 			  <div class="page__element page__body">
@@ -36,13 +43,13 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlew">&#8986; &nbsp; &nbsp; {{ cont.time|date:"G:i" }}</div>
+								<div class="titlew"><br>&#8986; &nbsp; &nbsp; {{ cont.time|date:"G:i" }}</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlew">Следующее<br>включение</div>
+								<div class="titlem">*</div>
 							</div>
-
+							
 						</div>
 
 						<div class="status__row">
@@ -52,9 +59,9 @@
 							</div>
 
 							<div class="status__column">
-								<div class="titlew">&#9200; &nbsp; &nbsp; {{ cont.nearest_time|date:"G:i" }}</div>
+								<div class="titlem">*</div>
 							</div>
-
+							
 						</div>
 
 
@@ -67,45 +74,39 @@
 							</div>
 
 							<div class="status__column">
-								<div class="titlew">
-									Канал 2
-								</div>
+								<div class="titlem">*</div>
+							</div>
+							
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlem">*</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlem">*</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlem">*</div>
 							</div>
 
 						</div>
 
 						<div class="status__row">
 							<div class="status__column">
-								<div class="titleb">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Каналы</a>
-								</div>
-
-							</div>
-							<div class="status__column">
-								<div class="titleb">
-									<a href="{% url 'manual_activation_selector' prefix %}" class="myxhref">Ручное</a>
-								</div>
-
-							</div>
-							<div class="status__column">
-								<div class="titleb">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Пауза</a>
-								</div>
-
-							</div>
-						</div>
-
-						<div class="status__row">
-							<div class="status__column">
-								<div id="chns_selector_0" class="titlef folderon">
-									<a  onClick="javascript:set_channels(0);" role="button" href="#" class="myxhref">Каналы 1-10<br></a>
+								<div id="chns_selector_0" class="titlef folderoff">
+									<a onClick="javascript:set_channels(0, false);" role="button" href="#" class="myxhref">Каналы 1-10<br></a>
 									<div id="chns_selector_0_status" class="chnon">1, 7, 10</div>
 								</div>
+								
 							</div>
 
 							<div class="status__column">
 								<div id="chns_selector_1" class="titlef folderoff">
-									<a onClick="javascript:set_channels(1);" role="button" href="#" class="myxhref">Каналы 11-20<br></a>
+									<a onClick="javascript:set_channels(1, false);" role="button" href="#" class="myxhref">Каналы 11-20<br></a>
 									<div id="chns_selector_1_status" class="chnon">11, 14, 19</div>
 								</div>
 
@@ -113,7 +114,7 @@
 
 							<div class="status__column">
 								<div id="chns_selector_2" class="titlef folderoff">
-									<a onClick="javascript:set_channels(2);" role="button" href="#" class="myxhref">Каналы 21-30<br></a>
+									<a onClick="javascript:set_channels(2, false);" role="button" href="#" class="myxhref">Каналы 21-30<br></a>
 									<div id="chns_selector_2_status" class="chnon">-</div>
 								</div>
 
@@ -121,35 +122,31 @@
 
 						</div>
 
-						<div id="chns_1-10">
+
 						<div class="status__row">
 
 							<div class="status__column">
-								<div id="chn1_div" class="titlev channelon">
-									<a id="chn1" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 1</a>
-									<div id="chn1_meandr" class="meandron">_∏_∏_</div>
+								<div id="chn1_div" class="titlev channeloff">
+									<a id="chn1" onClick="javascript:redirect_to_channel(1);" href="#" class="myxhref">Канал 1</a>
 								</div>
-
+								
 							</div>
 
 							<div class="status__column">
 								<div id="chn2_div" class="titlev channeloff">
-									<a id="chn2" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 2</a>
-									<div id="chn2_meandr" class="meandroff">_∏_∏_</div>
+									<a id="chn2" onClick="javascript:redirect_to_channel(2);" href="#" class="myxhref">Канал 2</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div id="chn3_div" class="titlev channeloff">
-									<a id="chn3" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 3</a>
-									<div id="chn3_meandr" class="meandroff">_∏_∏_</div>
+									<a id="chn3" onClick="javascript:redirect_to_channel(3);" href="#" class="myxhref">Канал 3</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div id="chn4_div" class="titlev channeloff">
-									<a id="chn4" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 4</a>
-									<div id="chn4_meandr" class="meandroff">_∏_∏_</div>
+									<a id="chn4" onClick="javascript:redirect_to_channel(4);" href="#" class="myxhref">Канал 4</a>
 								</div>
 							</div>
 
@@ -159,29 +156,25 @@
 
 							<div class="status__column">
 								<div id="chn5_div" class="titlev channeloff">
-									<a id="chn5" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 5</a>
-									<div id="chn5_meandr" class="meandroff">_∏_∏_</div>
+									<a id="chn5" onClick="javascript:redirect_to_channel(5);" href="#" class="myxhref">Канал 5</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div id="chn6_div" class="titlev channeloff">
-									<a id="chn6" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 6</a>
-									<div id="chn6_meandr" class="meandroff">_∏_∏_</div>
+									<a id="chn6" onClick="javascript:redirect_to_channel(6);" href="#" class="myxhref">Канал 6</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div id="chn7_div" class="titlev channeloff">
-									<a id="chn7" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 7</a>
-									<div id="chn7_meandr" class="meandroff">_∏_∏_</div>
+									<a id="chn7" onClick="javascript:redirect_to_channel(7);" href="#" class="myxhref">Канал 7</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div id="chn8_div" class="titlev channeloff">
-									<a id="chn8" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 8</a>
-									<div id="chn8_meandr" class="meandroff">_∏_∏_</div>
+									<a id="chn8" onClick="javascript:redirect_to_channel(8);" href="#" class="myxhref">Канал 8</a>
 								</div>
 							</div>
 
@@ -190,76 +183,50 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlev onledw">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Влажность</a>
-									<div class="meandron">45%</div>
-								</div>
-
+								<div class="titlem">*</div>
 							</div>
 
 							<div class="status__column">
 								<div id="chn9_div" class="titlev channeloff">
-									<a id="chn9" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 9</a>
-									<div id="chn9_meandr" class="meandroff">_∏_∏_</div>
+									<a id="chn9" onClick="javascript:redirect_to_channel(9);" href="#" class="myxhref">Канал 9</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div id="chn10_div" class="titlev channeloff">
-									<a id="chn10" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 10</a>
-									<div id="chn10_meandr" class="meandroff">_∏_∏_</div>
+									<a id="chn10" onClick="javascript:redirect_to_channel(10);" href="#" class="myxhref">Канал 10</a>
 								</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlev channeloff">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Насос</a>
-									<div class="meandroff">&nbsp;</div>
-								</div>
-
+								<div class="titlem">*</div>
+								
 							</div>
 
-						</div>
-							</div>
+						</div> 
 
 						<div class="status__row">
-
 							<div class="status__column">
-								<div class="imgsm">
-									{% load static %}
-									<img src="{% static 'img/pressw.png' %}" width="80%"  alt="">
-								</div>
-
-								<div class="titlew">2,5</div>
+								<div class="titlem">*</div>
 							</div>
 
 							<div class="status__column">
-								<div class="imgsm">
-									<img src="{% static 'img/potok.png' %}" width="80%"  alt="">
-								</div>
-								<div class="titlew">{{ cont.pressure }}</div>
+								<div class="titlem">*</div>
 							</div>
 
 							<div class="status__column">
-								<div class="imgsm">
-									<img src="{% static 'img/tankf.png' %}" width="75%"  alt="">
+								<div class="titlev">
+									<a href="{% url 'turn_off_all_channels' prefix %}" class="myxhref">Выключить все</a>
+									<br>&nbsp;
 								</div>
-								<div class="titlew">ON</div>
-							</div>
 
-							<div class="status__column">
-								<div class="imgsm">
-									<img src="{% static 'img/measure.png' %}" width="80%"  alt="">
-								</div>
-								<div class="titlew">{{ cont.t1 }}° {{ cont.t2 }}°</div>
 							</div>
-
 						</div>
 
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlew">Esp: {{ cont.esp_v }}</div>
+								<div class="titlew">Esp: 1.9.3</div>
 							</div>
 
 							<div class="status__column">
@@ -270,7 +237,7 @@
 								<div class="titlew">Avr: 159</div>
 							</div>
 
-						</div>
+						</div> 
 					</div>
 
 				 </div>
@@ -284,7 +251,7 @@
 			</div>
 	</div>
 		<script type="text/javascript">
-			set_channels(0);
+			set_channels(0, false);
 			set_channels_status();
 		</script>
 </body>

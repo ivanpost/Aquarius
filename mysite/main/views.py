@@ -58,6 +58,59 @@ def reports(request):
     return render(request, 'main/reports.html')
 
 @login_required
+def manual_activation(request, prefix, chn, minutes=0):
+    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+        return redirect("/")
+
+    chn = int(chn)
+
+    channel = Channel.objects.filter(controller__prefix=prefix, number=chn)
+    if len(channel) > 0:
+        channel = channel[0]
+    else:
+        return redirect("/")
+    cont = Controller.objects.get(prefix=prefix)
+    instance: ControllerV2Manager = ControllerV2Manager.get_instance(prefix)
+
+    if minutes > 0:
+        instance.command_turn_on_channel(chn, minutes)
+        instance.command_get_state()
+        return redirect("controller", prefix=prefix)
+
+    return render(request,
+                  "main/manual_activation.html",
+                  {
+                      "prefix": prefix,
+                      "cont": cont,
+                      "chn": chn,
+                  })
+
+
+@login_required
+def manual_activation_selector(request, prefix, turn_off_all=False):
+    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+        return redirect("/")
+
+    channels = Channel.objects.filter(controller__prefix=prefix)
+    cont = Controller.objects.get(prefix=prefix)
+
+    instance: ControllerV2Manager = ControllerV2Manager.get_instance(prefix)
+    instance.command_get_state()
+    if turn_off_all:
+        if instance is not None:
+            instance.turn_off_all_channels()
+            instance.command_get_state()
+            return redirect("controller", prefix=prefix)
+
+    return render(request,
+                  "main/manual_activation_selector.html",
+                  {
+                      "prefix": prefix,
+                      'channels_state_json': json.dumps([i.state for i in channels]),
+                      "cont": cont,
+                  })
+
+@login_required
 def controller(request, prefix):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
         return redirect("/")

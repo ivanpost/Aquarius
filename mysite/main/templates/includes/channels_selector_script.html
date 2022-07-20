@@ -1,0 +1,69 @@
+<script type="text/javascript">
+		var channels_state_json = "{{ channels_state_json }}";
+		var channels_state = JSON.parse(channels_state_json);
+		let current_page = 0
+
+		function set_channels(page, meandrs=true)
+		{
+			for (var i = 0; i <= 2; i++)
+			{
+				if (i == page)
+				{
+					document.getElementById("chns_selector_" + i.toString()).className = "titlef folderon"
+				}
+				else
+				{
+					document.getElementById("chns_selector_" + i.toString()).className = "titlef folderoff"
+				}
+			}
+			for (var i = 1; i <= 10; i++)
+			{
+				let channel_number = page * 10 + i;
+				document.getElementById('chn' + i.toString()).innerHTML = "Канал "  + channel_number.toString();
+
+				if (channel_number < channels_state.length)
+				{
+					var className = "titlev channeloff";
+					var classNameMeandr = "meandroff";
+
+					if (channels_state[channel_number - 1])
+					{
+						className = "titlev channelon";
+						classNameMeandr = "meandron";
+					}
+
+					document.getElementById('chn' + i.toString() + "_div").className = className;
+					if (meandrs)
+					{
+					    document.getElementById('chn' + i.toString() + "_meandr").className = classNameMeandr;
+					}
+				}
+			}
+			current_page = page;
+		}
+
+		function set_channels_status()
+		{
+			for (var i = 0; i <= 2; i++)
+			{
+				var active_channels = [];
+				for (var j = 1; j <= 10; j++)
+				{
+					let channel_number = i * 10 + j;
+
+					if (channels_state[channel_number - 1])
+					{
+						active_channels.push(channel_number.toString());
+					}
+
+				}
+				var active_channels_str = active_channels.join(", ")
+				if (active_channels_str == "")
+				{
+					active_channels_str = "-"
+				}
+
+				document.getElementById("chns_selector_" + i.toString() + "_status").innerHTML = active_channels_str;
+			}
+		}
+</script>

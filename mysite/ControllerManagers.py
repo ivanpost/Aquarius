@@ -103,19 +103,18 @@ class ControllerV2Manager:
         self.last_command = request_code
         self.mqtt_manager.send(self.topic_send, msg)
 
+    def turn_off_all_channels(self):
+        active_channels = Channel.objects.filter(controller__prefix=self.prefix, state=True)
+
+        for i in active_channels:
+            self.command_turn_on_channel(i.number, 0)
+
     def wrap_command(self, request_code: str, payload: str) -> str:
         return self.cmd_pattern.format(request_code=request_code, payload=payload,
                                        check_sum=self.get_check_sum(request_code, payload))
 
-    def command_turn_on_channel(self, channel_num, seconds) -> None:
-        #app: .1.2.3.4.3.2.1.0.0.2.3.0.3.0.8.9.8.7.6.7.8.9.9.
-        #my:  .1.2.3.4.3.2.1.0.0.2.3.0.3.0.11.9.8.7.6.7.8.9.9.
-
-        #my_new:  .1.2.3.4.3.2.1.0.0.2.3.0.3.0.8.9.8.7.6.7.8.9.9.
-        #app_new: .1.2.3.4.3.2.1.0.0.2.3.0.3.0.8.9.8.7.6.7.8.9.9.
-
-        #.1.2.3.4.3.2.1.0.0.2.3.0.10.0.15.9.8.7.6.7.8.9.9.
-        seconds_bytes = seconds.to_bytes(2, "big")
+    def command_turn_on_channel(self, channel_num, minutes) -> None:
+        seconds_bytes = minutes.to_bytes(2, "big")
         self.send_command("0.0.2", f"{channel_num}.{seconds_bytes[0]}.{seconds_bytes[1]}")
 
     def command_turn_on_channel_response(self, data, **kwargs) -> bool:
