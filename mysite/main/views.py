@@ -58,7 +58,7 @@ def reports(request):
     return render(request, 'main/reports.html')
 
 @login_required
-def manual_activation(request, prefix, chn, minutes=0):
+def manual_activation(request, prefix, chn, minutes=-1):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
         return redirect("/")
 
@@ -72,7 +72,7 @@ def manual_activation(request, prefix, chn, minutes=0):
     cont = Controller.objects.get(prefix=prefix)
     instance: ControllerV2Manager = ControllerV2Manager.get_instance(prefix)
 
-    if minutes > 0:
+    if minutes > -1:
         instance.command_turn_on_channel(chn, minutes)
         instance.command_get_state()
         return redirect("controller", prefix=prefix)
