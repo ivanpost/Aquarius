@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0">
+	<meta name="format-detection" content="telephone=no">
+	<title>Ручное управление</title>
+	<!--<link rel="stylesheet" href="css/style.css">-->
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+	<div class="wrapper">
+
+		<div class="page">
+			<div class="page__row">
+
+				<div class="page__element page__head">
+				 <div class="mhead">
+					<a target="_blank" href="https://hi-garden.ru/" class="mhead__logo xhref">Hi-Garden</a>
+					<div class="mhead__title">Пауза в поливе</Main></div>
+					<a target="_blank" href="https://hi-garden.ru/aqua2-manual" class="mhead__manual xhref">Menu</a>		 
+				 </div>
+			
+				</div>
+
+			  <div class="page__element page__body">
+
+				<div class="mbody">
+
+					 <div class="status">
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlew"><br>&#8986; &nbsp; &nbsp; {{ cont.time|date:"G:i" }}</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlew">
+									<br>Aquarius 294<br>Ягодное, Энергетиков, 13
+								</div>
+							</div>
+							
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlew">MQTT - {% if cont.esp_mqtt %}ОК{% else %}Нет подключения{% endif %}!</div>
+							</div>
+
+							<div class="status__column">&nbsp;</div>
+							
+						</div>
+
+						<div class="status__row">
+							<div class="status__column">
+								<div class="titlem">*</div>
+							</div>
+						</div>
+
+						<div class="titlew">
+							Работа контроллера будет приостановлена<br>на выбранное время:
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 1 %}" class="myxhref">1 мин</a>
+								</div>
+								
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 3 %}" class="myxhref">3 мин</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 5 %}" class="myxhref">5 мин</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 10 %}" class="myxhref">10 мин</a>
+								</div>
+							</div>
+
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 20 %}" class="myxhref">20 мин</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 40 %}" class="myxhref">40 мин</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 60 %}" class="myxhref">1 час</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 180 %}" class="myxhref">3 часа</a>
+								</div>
+							</div>
+
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 480 %}" class="myxhref">8 часов</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 1440 %}" class="myxhref">24 часа</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 2880 %}" class="myxhref">48 часов</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 4320 %}" class="myxhref">72 часа</a>
+								</div>
+							</div>
+
+						</div> 
+
+						<div class="status__row">
+
+							<div class="status__column">
+							</div>
+
+							<div class="status__column">
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' prefix 0 %}" class="myxhref">Возобновить<br>полив</a>
+								</div>
+							</div>
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlew">Esp: 1.9.3</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlew">And: site</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlew">Avr: 159</div>
+							</div>
+
+						</div> 
+					</div>
+
+				 </div>
+			  </div>
+
+			  <div class="page__element page__footer">
+				<div class="fcontent">
+					<a target="_blank" href="https://hi-garden.ru/" class="mhead__manual xhref">Контроллеры орошения</a>
+				</div>
+			  </div>
+			</div>
+	</div>
+</body>
+</html>

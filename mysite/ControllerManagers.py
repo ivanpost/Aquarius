@@ -114,15 +114,12 @@ class ControllerV2Manager:
                                        check_sum=self.get_check_sum(request_code, payload))
 
     def command_turn_on_channel(self, channel_num, minutes) -> None:
-        seconds_bytes = minutes.to_bytes(2, "big")
-        self.send_command("0.0.2", f"{channel_num}.{seconds_bytes[0]}.{seconds_bytes[1]}")
+        minutes_bytes = minutes.to_bytes(2, "big")
+        self.send_command("0.0.2", f"{channel_num}.{minutes_bytes[0]}.{minutes_bytes[1]}")
 
-    def command_turn_on_channel_response(self, data, **kwargs) -> bool:
-        parsed_message = list(map(try_int, data.split(".")))
-        for i in parsed_message[7:11]:
-            for j in list(BitArray(uint=i, length=8)):
-                pass
-        return True
+    def command_pause(self, minutes) -> None:
+        minutes_bytes = minutes.to_bytes(2, "big")
+        self.send_command("0.0.7", f"{minutes_bytes[0]}.{minutes_bytes[1]}")
 
     def command_get_channels(self) -> None:
         self.send_command("0.0.8")

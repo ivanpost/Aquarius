@@ -58,6 +58,27 @@ def reports(request):
     return render(request, 'main/reports.html')
 
 @login_required
+def pause(request, prefix, minutes: int = -1):
+    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+        return redirect("/")
+
+    cont = Controller.objects.get(prefix=prefix)
+    instance: ControllerV2Manager = ControllerV2Manager.get_instance(prefix)
+
+    if minutes > -1:
+        instance.command_pause(minutes)
+        instance.command_get_state()
+        return redirect("controller", prefix=prefix)
+
+    return render(request,
+                  "main/pause_activation.html",
+                  {
+                      "prefix": prefix,
+                      "cont": cont,
+                  })
+
+
+@login_required
 def manual_activation(request, prefix, chn, minutes=-1):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
         return redirect("/")
