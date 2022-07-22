@@ -135,6 +135,8 @@ def manual_activation_selector(request, prefix, turn_off_all=False):
 def controller(request, prefix):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
         return redirect("/")
+
+
     def get_day(start, l):
         out = []
         for i in range(24):
@@ -169,6 +171,11 @@ def controller(request, prefix):
     instance = ControllerV2Manager.get_instance(prefix)
     if instance is not None:
         instance.command_get_state()
+
+    if request.method == "POST":
+        if "set_time" in request.POST.dict().keys():
+            received_time = request.POST.dict()["set_time"].split("-")
+            instance.command_set_time(*[int(i) for i in received_time])
 
     programs = Program.objects.filter(channel__controller__prefix=prefix)
     channels = Channel.objects.filter(controller__prefix=prefix)

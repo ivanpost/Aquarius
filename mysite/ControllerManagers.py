@@ -134,6 +134,11 @@ class ControllerV2Manager:
     def command_get_state(self) -> None:
         self.send_command("8.8.8.8.8.8.8.8")
 
+    def command_set_time(self, year, month, day, hour, minute, second):
+
+        data = '.'.join([str(i) for i in [minute, hour, second, day, month, year % 100]])
+        self.send_command("0.0.1", data)
+
     def command_get_state_response(self, data, **kwargs) -> bool:
         try:
             data = kwargs["old_data"]

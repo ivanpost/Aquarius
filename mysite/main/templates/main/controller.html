@@ -12,6 +12,30 @@
 	<link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 {% include "includes/channels_selector_script.html" %}
+<form name="set_time_form">
+	{% csrf_token %}
+</form>
+<script type="text/javascript">
+	function check_controller_time()
+	{
+		var device_time = new Date();
+		var controller_time = new Date(device_time.getFullYear(), device_time.getMonth(), device_time.getDate(), {{ cont.time|date:'G' }}, {{ cont.time|date:'i' }}, {{ cont.time|date:'s' }});
+		if (Math.abs(device_time - controller_time) > (1000 * 90))
+		{
+			if (confirm("Время на контроллере не совпадает со временем на устройстве. Синхронизировать?"))
+			{
+				var formData = new FormData(document.forms.set_time_form);
+
+				var str_time = [device_time.getFullYear(), device_time.getMonth(), device_time.getDate(), device_time.getHours(), device_time.getMinutes(), device_time.getSeconds()].join("-");
+				formData.append("set_time", str_time);
+
+				var xhr = new XMLHttpRequest();
+  				xhr.open("POST", "{% url 'controller' prefix %}");
+  				xhr.send(formData);
+			}
+		}
+	}
+</script>
 <body>
 	<div class="wrapper">
 
@@ -36,7 +60,7 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlew">&#8986; &nbsp; &nbsp; {{ cont.time|date:"G:i" }}</div>
+								<div class="titlew">&#8986; &nbsp; &nbsp; {{ cont.time|date:"H:i" }}</div>
 							</div>
 
 							<div class="status__column">
@@ -284,6 +308,7 @@
 			</div>
 	</div>
 		<script type="text/javascript">
+			check_controller_time();
 			set_channels(0);
 			set_channels_status();
 		</script>
