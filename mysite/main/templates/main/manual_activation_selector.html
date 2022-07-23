@@ -12,6 +12,39 @@
 </head>
 {% include "includes/channels_selector_script.html" %}
 <script type="text/javascript">
+	var PREFIX = "{{ prefix }}"
+	var channels_state = [];
+
+	function update_data_on_page(properties)
+	{
+		if (properties["channels_state"] != undefined)
+		{
+			channels_state = properties["channels_state"];
+			set_channels(current_page, false);
+			set_channels_status();
+		}
+	}
+
+	const socket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/controller'
+        );
+
+	socket.onopen = function(e)
+	{
+	  	socket.send(JSON.stringify({"prefix": PREFIX, "command": "get_properties"}));
+	};
+
+    socket.onmessage = function(event)
+    {
+    	var data = JSON.parse(event.data);
+    	if (data["type"] == "properties")
+    	{
+    		update_data_on_page(data);
+    	}
+	};
+
 	var pattern = "{% url 'manual_activation' prefix '-to_replace-' %}"
 	function redirect_to_channel(num)
 	{

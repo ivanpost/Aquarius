@@ -1,9 +1,7 @@
 <script type="text/javascript">
-		var channels_state_json = "{{ channels_state_json }}";
-		var channels_state = JSON.parse(channels_state_json);
 		let current_page = 0
 
-		function set_channels(page, meandrs=true)
+		function set_channels(page=current_page, meandrs=true)
 		{
 			for (var i = 0; i <= 2; i++)
 			{

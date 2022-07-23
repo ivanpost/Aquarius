@@ -16,10 +16,75 @@
 	{% csrf_token %}
 </form>
 <script type="text/javascript">
+	const PREFIX = "{{ prefix }}"
+	var channels_state = [];
+	var load_time = new Date();
+	var controller_time = new Date(load_time.getFullYear(), load_time.getMonth(), load_time.getDate(), 0, 0, 0);
+
+	function update_data_on_page(properties)
+	{
+		if (properties["hour"] != undefined & properties["minute"] != undefined & properties["second"] != undefined)
+		{
+			controller_time = new Date(load_time.getFullYear(), load_time.getMonth(), load_time.getDate(), properties["hour"], properties["minute"], properties["second"]);
+
+			document.getElementById("controller_time").innerHTML = "&#8986; &nbsp; &nbsp; " + controller_time.getHours().toString() + ":" + controller_time.getMinutes().toString();
+
+			check_controller_time();
+		}
+
+		if (properties["esp_mqtt"] != undefined)
+		{
+			if (properties["esp_mqtt"])
+			{
+				document.getElementById("mqtt_status").innerHTML = "MQTT - OK!"
+			}
+			else
+			{
+				document.getElementById("mqtt_status").innerHTML = "MQTT - ОШИБКА!"
+			}
+		}
+
+		if (properties["next_time_hour"] != undefined & properties["next_time_minute"] != undefined)
+		{
+			document.getElementById("next_activation_time").innerHTML = "&#9200; &nbsp; &nbsp; " + properties["next_time_hour"].toString() + ":" + properties["next_time_minute"].toString();
+		}
+
+		if (properties["next_chn"] != undefined)
+		{
+			document.getElementById("next_activation_channel").innerHTML = "Канал " + properties["next_chn"].toString();
+		}
+
+		if (properties["channels_state"] != undefined)
+		{
+			channels_state = properties["channels_state"];
+			set_channels();
+			set_channels_status();
+		}
+	}
+
+	const socket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/controller'
+        );
+
+	socket.onopen = function(e)
+	{
+	  	socket.send(JSON.stringify({"prefix": PREFIX, "command": "get_properties"}));
+	};
+
+    socket.onmessage = function(event)
+    {
+    	var data = JSON.parse(event.data);
+    	if (data["type"] == "properties")
+    	{
+    		update_data_on_page(data);
+    	}
+	};
+
 	function check_controller_time()
 	{
 		var device_time = new Date();
-		var controller_time = new Date(device_time.getFullYear(), device_time.getMonth(), device_time.getDate(), {{ cont.time|date:'G' }}, {{ cont.time|date:'i' }}, {{ cont.time|date:'s' }});
 		if (Math.abs(device_time - controller_time) > (1000 * 90))
 		{
 			if (confirm("Время на контроллере не совпадает со временем на устройстве. Синхронизировать?"))
@@ -33,6 +98,7 @@
   				xhr.open("POST", "{% url 'controller' prefix %}");
   				xhr.send(formData);
 			}
+
 		}
 	}
 </script>
@@ -60,7 +126,7 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlew">&#8986; &nbsp; &nbsp; {{ cont.time|date:"H:i" }}</div>
+								<div id="controller_time" class="titlew">&#8986; &nbsp; &nbsp; Загрузка...</div>
 							</div>
 
 							<div class="status__column">
@@ -72,11 +138,11 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div class="titlew">MQTT - {% if cont.esp_mqtt %}ОК{% else %}Нет подключения{% endif %}!</div>
+								<div id="mqtt_status" class="titlew">MQTT - Загрузка...</div>
 							</div>
 
 							<div class="status__column">
-								<div class="titlew">&#9200; &nbsp; &nbsp; {{ cont.nearest_time|date:"G:i" }}</div>
+								<div id="next_activation_time" class="titlew">&#9200; &nbsp; &nbsp; Загрузка...</div>
 							</div>
 
 						</div>
@@ -91,8 +157,8 @@
 							</div>
 
 							<div class="status__column">
-								<div class="titlew">
-									Канал 2
+								<div id="next_activation_channel" class="titlew">
+									Загрузка...
 								</div>
 							</div>
 
@@ -121,16 +187,16 @@
 
 						<div class="status__row">
 							<div class="status__column">
-								<div id="chns_selector_0" class="titlef folderon">
+								<div id="chns_selector_0" class="titlef folderoff">
 									<a  onClick="javascript:set_channels(0);" role="button" href="#" class="myxhref">Каналы 1-10<br></a>
-									<div id="chns_selector_0_status" class="chnon">1, 7, 10</div>
+									<div id="chns_selector_0_status" class="chnon">-</div>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div id="chns_selector_1" class="titlef folderoff">
 									<a onClick="javascript:set_channels(1);" role="button" href="#" class="myxhref">Каналы 11-20<br></a>
-									<div id="chns_selector_1_status" class="chnon">11, 14, 19</div>
+									<div id="chns_selector_1_status" class="chnon">-</div>
 								</div>
 
 							</div>
@@ -149,9 +215,9 @@
 						<div class="status__row">
 
 							<div class="status__column">
-								<div id="chn1_div" class="titlev channelon">
+								<div id="chn1_div" class="titlev channeloff">
 									<a id="chn1" target="_blank" href="https://hi-garden.ru" class="myxhref">Канал 1</a>
-									<div id="chn1_meandr" class="meandron">_∏_∏_</div>
+									<div id="chn1_meandr" class="meandroff">_∏_∏_</div>
 								</div>
 
 							</div>
@@ -308,9 +374,7 @@
 			</div>
 	</div>
 		<script type="text/javascript">
-			check_controller_time();
-			set_channels(0);
-			set_channels_status();
+
 		</script>
 </body>
 </html>

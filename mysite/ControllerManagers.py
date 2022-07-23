@@ -6,6 +6,7 @@ from bitstring import BitArray
 from django.contrib.auth.models import User
 import json
 from typing import List
+from main.consumers import ControllerConsumer
 def try_int(i):
     try:
         return int(i)
@@ -131,6 +132,40 @@ class ControllerV2Manager:
                 pass
         return True
 
+    def get_controller_properties(self) -> dict:
+        channels = Channel.objects.filter(controller__prefix=self.data_model.prefix)
+        channels_state = [i.state for i in channels]
+
+        properties = {
+            "hour": self.data_model.time.hour,
+            "minute": self.data_model.time.minute,
+            "second": self.data_model.time.second,
+            "day_of_week": self.data_model.day,
+            "even_week": self.data_model.week,
+            "next_chn": self.data_model.nearest_chn,
+            "next_time_hour": self.data_model.nearest_time.hour,
+            "next_time_minute": self.data_model.nearest_time.minute,
+            "temp1": self.data_model.t1,
+            "temp2": self.data_model.t2,
+            "temp_amount": self.data_model.t_amount,
+            "rain": self.data_model.rain,
+            "pause": self.data_model.pause,
+            "version": self.data_model.version,
+            "ip": self.data_model.ip,
+            "esp_v": self.data_model.esp_v,
+            "esp_connected": self.data_model.esp_connected,
+            "esp_ap": self.data_model.esp_ap,
+            "esp_net": self.data_model.esp_net,
+            "esp_mqtt": self.data_model.esp_mqtt,
+            "esp_errors": self.data_model.esp_errors,
+            "pressure": self.data_model.pressure,
+            "stream": self.data_model.stream,
+            "num": self.data_model.num,
+            "channels_state": channels_state
+        }
+
+        return properties
+
     def command_get_state(self) -> None:
         self.send_command("8.8.8.8.8.8.8.8")
 
@@ -170,7 +205,6 @@ class ControllerV2Manager:
             self.data_model.stream = s[37]
             self.data_model.num = f"{s[39]}-{s[40]}"
 
-
             db_chns = {i.number: i for i in Channel.objects.filter(controller=self.data_model)}
             chns = list(list(BitArray(uint=s[15], length=8)))[::-1] + list(BitArray(uint=s[16], length=8))[::-1] + list(
                 BitArray(uint=s[17], length=8))[::-1] + list(BitArray(uint=s[18], length=8)[::-1])
@@ -181,6 +215,9 @@ class ControllerV2Manager:
                         db_chns[c].state = s
                         db_chns[c].save()
             self.data_model.save()
+
+            ControllerConsumer.send_properties(self.get_controller_properties())
+
             return False
         except:
             return True
