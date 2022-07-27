@@ -67,12 +67,12 @@ body {
 }
 @media (max-width: 970px) {
   body {
-    font-size: 14px;
+    font-size: 16px;
   }
 }
 @media (max-width: 768px) {
   body {
-    font-size: 12px;
+    font-size: 14px;
   }
 }
 @media (max-width: 320px) {
@@ -88,19 +88,16 @@ body {
 .page {
   height: 100%;
 }
-
 .page__row {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
 }
-
 .page__body {
   flex: 1 1 auto;
   justify-content: space-between;
 }
-
 .page__footer {
   height: 50px;
   background-color: #006400;
@@ -111,10 +108,6 @@ body {
   padding: 10px 0;
   text-align: center;
   color: #fff;
-}
-
-.page__content {
-  background-color: #8FBC8F;
 }
 
 .mhead {
@@ -138,14 +131,22 @@ body {
   font-size: 150%;
   font-weight: 500;
   margin: 0 2%;
+  white-space: nowrap;
+}
+.mhead__channel {
+  font-size: 100%;
+  font-weight: 700;
+  margin: 0 2%;
+  text-align: left;
 }
 .mhead__manual {
-  font-size: 130%;
-  font-weight: 500;
-  text-align: center;
+  font-size: 150%;
+  font-weight: 700;
+  text-align: right;
   text-decoration: underline;
   color: #fff;
-  padding-right: 1%;
+  padding-right: 4%;
+  text-decoration: none;
 }
 
 .mbody {
@@ -162,10 +163,19 @@ body {
 .mbody .status__row {
   display: flex;
   justify-content: space-between;
+  align-items: stretch;
+}
+.mbody .status__table {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #2E8B57;
 }
 .mbody .status__column {
   width: 50%;
   align-items: center;
+  overflow: hidden;
 }
 
 .xhref:hover {
@@ -226,7 +236,7 @@ body {
   line-height: 120%;
   white-space: nowrap;
   margin: 2% 2% 3% 2%;
-  background-color: #2F4F4F;
+  align-content: center;
 }
 
 .meandron {
@@ -267,4 +277,126 @@ body {
 
 .titlem {
   opacity: 0;
-}/*# sourceMappingURL=controller.css.map */
+}
+
+.npp {
+  flex: 0 0 10%;
+  background-color: #2E8B57;
+  border: 1px solid #fff;
+}
+
+.wdays {
+  flex: 0 0 35%;
+  background-color: #2E8B57;
+  border: 1px solid #fff;
+}
+
+.tbas {
+  flex: 0 0 25%;
+  background-color: #2E8B57;
+  border: 1px solid #fff;
+}
+
+.lbas {
+  flex: 0 0 15%;
+  background-color: #2E8B57;
+  border: 1px solid #fff;
+}
+
+.wbas {
+  background-color: #2E8B57;
+  border: 1px solid #fff;
+}
+
+input {
+  width: 70%;
+  color: #fff;
+  font-size: 150%;
+  font-weight: 700;
+  margin: 4% 0;
+  padding-left: 5%;
+  background-color: inherit;
+  text-align: center;
+  align-items: stretch;
+}
+
+#bige {
+  transform: scale(2);
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.wdbox {
+  width: 100%;
+  color: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-start;
+  margin: 2% 8%;
+}
+.wdbox__row {
+  display: inline-flex;
+  color: white;
+  font-size: 150%;
+  font-weight: 700;
+  line-height: 120%;
+  white-space: nowrap;
+}
+
+button[name=all_days] {
+  border: none;
+  border-radius: 4px;
+  background: #006400;
+  cursor: pointer;
+  color: white;
+  padding: 10% 30%;
+  font-size: 120%;
+  font-weight: 700;
+  line-height: 120%;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+}
+button[name=all_days]:hover {
+  background: #2F4F4F;
+}
+button[name=all_days]:active {
+  box-shadow: inset 3px 3px 10px 4px #7CFC00;
+}
+
+button[name=save_prog] {
+  border: none;
+  border-radius: 4px;
+  background: #4B0082;
+  cursor: pointer;
+  padding: 5% 30%;
+  margin: 5% 2%;
+  font-size: 120%;
+  font-weight: 700;
+  line-height: 120%;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+}
+button[name=save_prog]:hover {
+  background: #006400;
+}
+button[name=save_prog]:active {
+  box-shadow: inset 3px 3px 10px 4px #7CFC00;
+}
+
+button[name=manual] {
+  border: none;
+  border-radius: 4px;
+  background: #4B0082;
+  cursor: pointer;
+  padding: 5% 30%;
+  margin: 5% 2%;
+  font-size: 120%;
+  font-weight: 700;
+  line-height: 120%;
+}
+button[name=manual]:hover {
+  background: #006400;
+}
+button[name=manual]:active {
+  box-shadow: inset 3px 3px 10px 4px #7CFC00;
+}/*# sourceMappingURL=style.css.map */

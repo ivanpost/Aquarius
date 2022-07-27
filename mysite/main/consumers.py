@@ -2,8 +2,6 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 
 
-
-
 class ControllerConsumer(WebsocketConsumer):
 
     consumers = []

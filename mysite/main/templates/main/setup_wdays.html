@@ -1,0 +1,163 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0">
+	<meta name="format-detection" content="telephone=no">
+	<title>Aquarius</title>
+	<!--<link rel="stylesheet" href="css/style.css">-->
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+	<form id="prog_settings" action="#" method="post" enctype="multipart/form-data"></form>
+	<div class="wrapper">
+
+		<div class="page">
+			<div class="page__row">
+
+				<div class="page__element page__head">
+					<div class="mhead">
+						<div class="mhead__title">
+							<b>Программа полива</b>
+						</div>
+
+						<div class="mhead__channel">
+							<input type="text" name="channel_name" form="prog_settings" value="Канал 12" />
+						</div>
+
+						<div class="mhead__manual">
+							<a target="_blank" href="https://hi-garden.ru/aqua2-manual" class="mhead__manual xhref">&#8942;</a>
+						</div>
+						
+					</div>
+
+				</div>
+
+			  	<div class="page__element page__body">
+
+					<div class="mbody">
+
+						<div class="status">
+
+							<div class="status__row">
+
+								<div class="status__column wbas">
+									<div class="titlew"><br>Программа №<br></div>
+									<input type="number" name="prog_num" form="prog_settings" value="10" />
+								</div>
+
+								<div class="status__column wbas">
+									<div class="titlew">Время<br>включения<br></div>
+									<input type="time" name="prog_time" form="prog_settings" value="12:00" />
+								</div>
+
+								<div class="status__column">
+									<div class="status__row wbas">
+										<div class="titlew">Длительность при</div>
+									</div>
+
+									<div class="status__row">
+										<div class="status__column wbas">
+											<div class="titlew">°C<br>min</div>
+											<input type="number" name="prog_cmin" form="prog_settings" value="15" />
+										</div>
+			
+										<div class="status__column wbas">
+											<div class="titlew">°C<br>max</div>
+											<input type="number" name="prog_cmax" form="prog_settings" value="25" />
+										</div>
+									</div>
+								</div>
+
+							</div>
+
+
+
+						<div class="status__row" style="flex: 1 1 auto;">
+
+							<div class="status__column" style="background-color: #2E8B57; margin: 2%;">
+								<div class="wdbox">
+
+									<div class="wdbox__row">
+										<input type="checkbox" id="bige" name="wd1" form="prog_settings" value="1" />&nbsp; &nbsp;Понедельник
+									</div>
+
+									<div class="wdbox__row">
+										<input type="checkbox" id="bige" name="wd2" form="prog_settings" value="2" />&nbsp; &nbsp; Bторник
+									</div>
+
+									<div class="wdbox__row">
+										<input type="checkbox" id="bige" name="wd3" form="prog_settings" value="3" />&nbsp; &nbsp; Среда
+									</div>
+
+									<div class="wdbox__row">
+										<input type="checkbox" id="bige" name="wd4" form="prog_settings" value="4" />&nbsp; &nbsp;Четверг
+									</div>
+
+									<div class="wdbox__row">
+										<input type="checkbox" id="bige" name="wd5" form="prog_settings" value="5" />&nbsp; &nbsp; Пятница
+									</div>
+
+									<div class="wdbox__row">
+										<input type="checkbox" id="bige" name="wd6" form="prog_settings" value="6" />&nbsp; &nbsp; Суббота
+									</div>
+
+									<div class="wdbox__row">
+										<input type="checkbox" id="bige" name="wd7" form="prog_settings" value="7" />&nbsp; &nbsp; Воскресенье
+									</div>
+
+									<div class="wdbox__row">
+										<button type="button" name="all_days" form="prog_settings">Все дни</button>
+									</div>
+
+								</div>
+
+							</div>
+
+							<div class="status__column" style="background-color: #2E8B57; margin: 2%;">
+								<div class="wdbox">
+
+									<div class="wdbox__row">
+										<p>&nbsp; &nbsp; Неделя</p>
+									</div>
+
+									<div class="wdbox__row">
+										<input type="checkbox" id="bige" name="chetn" form="prog_settings" value="2" />&nbsp; &nbsp; Четная
+									</div>
+
+									<div class="wdbox__row">
+										<input type="checkbox" id="bige" name="nechetn" form="prog_settings" value="3" />&nbsp; &nbsp; Нечетная
+									</div>
+
+									<div class="wdbox__row">&nbsp;</div>
+									<div class="wdbox__row">&nbsp;</div>
+									<div class="wdbox__row">&nbsp;</div>
+
+								</div>
+							</div>
+
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="wdbox__row">
+									<button type="button" name="save_prog" form="prog_settings"><img src="/img/save.png" alt="Сохранить" title="Сохранить" width="80%"></button>
+								</div>
+							</div>
+
+						</div>
+					</div>
+
+				 </div>
+			 	</div>
+
+			  	<div class="page__element page__footer" style="height: 30px;">
+				</div>
+			</div>
+	</div>
+</body>
+</html>

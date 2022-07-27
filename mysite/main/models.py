@@ -38,28 +38,49 @@ class Controller(models.Model):
     def __str__(self):
         return self.prefix
 
-
 class Channel(models.Model):
     id = models.AutoField(primary_key=True)
     number = models.IntegerField(default=1)
     name = models.CharField(max_length=64, default="Канал")
     controller = models.ForeignKey('Controller', on_delete=models.CASCADE)
     state = models.BooleanField(default=False)
+    season = models.IntegerField(default=100)
+    cmin = models.IntegerField(default=10)
+    cmax = models.IntegerField(default=30)
+    meandr_on = models.IntegerField(default=60)
+    meaoff_cmin = models.IntegerField(default=0)
+    meaoff_cmax = models.IntegerField(default=0)
+    press_on = models.FloatField(default=2.1)
+    press_off = models.FloatField(default=3.8)
+    lowlevel = models.BooleanField(default=False)
+    rainsens = models.BooleanField(default=True)
+    tempsens = models.IntegerField(default=1)
 
     def __str__(self):
         return f"{self.controller.prefix} / {self.number}"
+
 
 
 class Program(models.Model):
     id = models.AutoField(primary_key=True)
     channel = models.ForeignKey('Channel', on_delete=models.CASCADE)
     days = models.CharField(max_length=7, default='')
+    weeks = models.SmallIntegerField(default=0)
     hour = models.IntegerField(default=0)
     minute = models.IntegerField(default=0)
     t_min = models.IntegerField(default=0)
     t_max = models.IntegerField(default=0)
+    number = models.IntegerField(default=0)
+
+
+    class Meta:
+        constraints = []
+
+    def get_weeks(self) -> list:
+        bin_weeks = bin(self.weeks)
+        return [bool(int(i)) for i in list(bin_weeks[2:4])]
 
     def __str__(self):
-        return f"{self.channel.controller.prefix} / {self.channel.id} / ({self.days}|{self.hour}:{self.minute})"
+        return f"{self.channel.controller.prefix} / {self.channel.number} / ({self.days}|{self.hour}:{self.minute})"
 
 

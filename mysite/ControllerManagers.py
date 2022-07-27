@@ -1,5 +1,5 @@
 from MQTTManager import MQTTManager
-from main.models import Controller, Channel, UserExtension
+from main.models import Controller, Channel, UserExtension, Program
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import datetime
 from bitstring import BitArray
@@ -25,6 +25,8 @@ class ControllerV2Manager:
     prefix: str
     command_response_handlers: dict
 
+    blocked: bool = False
+    packet: int = 0
     last_command: str
     data_model: Controller
     mqtt_manager: MQTTManager
@@ -100,9 +102,10 @@ class ControllerV2Manager:
         mqtt.onConnected = self.on_connected
 
     def send_command(self, request_code: str, payload: str = ""):
-        msg = self.wrap_command(request_code, payload)
-        self.last_command = request_code
-        self.mqtt_manager.send(self.topic_send, msg)
+        if not self.blocked:
+            msg = self.wrap_command(request_code, payload)
+            self.last_command = request_code
+            self.mqtt_manager.send(self.topic_send, msg)
 
     def turn_off_all_channels(self):
         active_channels = Channel.objects.filter(controller__prefix=self.prefix, state=True)
@@ -125,12 +128,52 @@ class ControllerV2Manager:
     def command_get_channels(self) -> None:
         self.send_command("0.0.8")
 
-    def command_get_channels_response(self, data, **kwargs) -> bool:
+    def edit_or_add_program(self, channel_num: int, prg_num: int, days: str, weeks: tuple, start_hour: int, start_minute: int, t_min: int, t_max: int):
+        chan = Channel.objects.get(controller__prefix=self.data_model.prefix, number=channel_num)
+        prg = Program.objects.filter(channel=chan, number=prg_num)
+        if len(prg) > 0:
+            prg = prg[0]
+        else:
+            prg = Program()
+        prg.channel = chan
+        prg.number = prg_num
+        prg.days = days
+        prg.weeks = int(f'{int(weeks[0])}{int(weeks[1])}', 2)
+        prg.hour = start_hour
+        prg.minute = start_minute
+        prg.t_min = t_min
+        prg.t_max = t_max
+        prg.save()
+
+    def create_program(self, channel_num: int) -> Program:
+        chan = Channel.objects.get(controller__prefix=self.data_model.prefix, number=channel_num)
+        programs = Program.objects.filter(channel=chan)
+        if len(programs) == 0:
+            prg_num = 1
+        else:
+            prg_num = max([i.number for i in programs]) + 1
+        prg = Program()
+        prg.channel = chan
+        prg.number = prg_num
+        prg.days = "1234567"
+        prg.weeks = 3
+        prg.hour = 0
+        prg.minute = 0
+        prg.t_min = 60
+        prg.t_max = 120
+        prg.save()
+        return prg
+
+
+    def command_send_channels_and_programs(self) -> None:
+        pass
+
+    def command_get_channels_response(self, data: str, **kwargs) -> bool:
+        self.blocked = True
+
         parsed_message = list(map(try_int, data.split(".")))
-        for i in parsed_message[7:11]:
-            for j in list(BitArray(uint=i, length=8)):
-                pass
-        return True
+
+        return False
 
     def get_controller_properties(self) -> dict:
         channels = Channel.objects.filter(controller__prefix=self.data_model.prefix)
@@ -233,7 +276,6 @@ class ControllerV2Manager:
                     check_sum += int(i)
         check_sum_bytes = check_sum.to_bytes(2, "big")
         return check_sum_bytes[0], check_sum_bytes[1]
-        return 0, 8
 
     def handle_message(self, mqtt: MQTTManager, controller_prefix: str, data: str) -> None:
         if self.last_command in self.command_response_handlers.keys():
@@ -243,4 +285,4 @@ class ControllerV2Manager:
 
 #MQTT - [aqua_kontr] - .1.2.3.4.3.2.1.18.44.29.3.23.0.0.0.0.0.0.1.0.0.0.0.25.61.0.159.192.168.31.160.1.9.3.13.38.0.0.5.142.127.9.8.7.6.7.8.9..
 #MQTT - [aqua_kontr] - .1.2.3.4.3.2.1.18.45.29.3.23.0.0.0.0.0.0.1.0.0.0.0.25.61.0.159.192.168.31.160.1.9.3.13.37.0.0.5.142.127.9.8.7.6.7.8.9..
-
+#.1.2.3.4.3.2.1.0.2.6.5.35.60.0.0.5.5.1.1.100.0.0.0.1.1.0.0.0.0.0.121.3.9.2.20.30.127.3.1.12.25.35.2.98.9.8.7.6.7.8.9.9.

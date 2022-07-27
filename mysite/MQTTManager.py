@@ -128,17 +128,3 @@ class MQTTManager:
             return m if s else None
         except:
             return None
-
-if __name__ == "__main__":
-    print(MQTTManager.try_connect("2E8", "433987208"))
-
-    while True:
-        pass
-
-    '''def on_connect(cl, ud, fl, rc):
-        print(rc)
-    client = MQTT.Client("mqtt-test")  # client ID "mqtt-test"
-    client.on_connect = on_connect
-    client.username_pw_set("2E8", "433987208")
-    client.connect('185.134.36.37', 18883)
-    client.loop_forever()'''

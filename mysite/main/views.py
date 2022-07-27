@@ -259,7 +259,7 @@ def channels(request, prefix):
     channels = Channel.objects.filter(controller__prefix=prefix)
 
 @login_required
-def channel(request, prefix, chn):
+def channel(request, prefix, chn, create_prg=False):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
         return redirect("/")
     def get_day(start, l):
@@ -302,78 +302,71 @@ def channel(request, prefix, chn):
     class PrgData:
         id = 0
         header = ""
-        d1 = 0
-        d2 = 0
-        d3 = 0
-        d4 = 0
-        d5 = 0
-        d6 = 0
-        d7 = 0
-        t_start = ""
-        t_stop_min = ""
-        t_stop_max = ""
+        days = []
+        weeks = ()
+        t_start_hour = 0
+        t_start_minute = 0
+        t_min = 0
+        t_max = 0
 
-        def __init__(self, id, days, hour, minute, t_min, t_max):
+        def toDict(self):
+            return {
+                "days": self.days,
+                "weeks": self.weeks,
+                "t_start_hour": self.t_start_hour,
+                "t_start_minute": self.t_start_minute,
+                "t_min": self.t_min,
+                "t_max": self.t_max,
+            }
+
+        def __init__(self, id, days, hour, minute, even_week, odd_week, t_min, t_max):
             self.id = id
-            self.d1 = '1' in days
-            self.d2 = '2' in days
-            self.d3 = '3' in days
-            self.d4 = '4' in days
-            self.d5 = '5' in days
-            self.d6 = '6' in days
-            self.d7 = '7' in days
-            self.t_start = norm_time(hour, minute)
-            self.t_stop_min = norm_time(t_min // 60, t_min % 60)
-            self.t_stop_max = norm_time(t_max // 60, t_max % 60)
-            self.header = f"{days} | {self.t_start} - {self.t_stop_max}"
+            self.days = days
+            self.weeks = [even_week, odd_week]
+            self.t_start_hour = hour
+            self.t_start_minute = minute
+            self.t_min = t_min
+            self.t_max = t_max
 
-    chan = Channel.objects.get(controller__prefix=prefix, id=chn)
+    instance: ControllerV2Manager = ControllerV2Manager.get_instance(prefix)
+
+    if create_prg:
+        instance.create_program(chn)
+        return redirect("channel", prefix, chn)
+
+    chan: Channel = Channel.objects.get(controller__prefix=prefix, number=chn)
     programs = Program.objects.filter(channel=chan)
+
+    cont = Controller.objects.get(prefix=prefix)
     lines = []
     prgs = []
     lines.append(get_week(chan))
     for pr in programs:
-        prgs.append(PrgData(pr.id, pr.days, pr.hour, pr.minute, pr.t_min, pr.t_max))
-    if request.method == 'POST':
-        data = request.POST.dict()
-        if "create" in data.keys():
-            prg = Program()
-            prg.channel = chan
-            prg.days = ''.join([str(i+1) for i in range(7) if f'days_{i}' in data.keys()])
-            if (prg.days != ''):
-                prg.hour = int(data['time_start'][:2])
-                prg.minute = int(data['time_start'][3:])
-                t_start = timedelta(hours=prg.hour, minutes=prg.minute)
-                t_end_min = timedelta(hours=int(data['time_end_min'][:2]), minutes=int(data['time_end_min'][3:]))
-                t_end_max = timedelta(hours=int(data['time_end_max'][:2]),
-                                      minutes=int(data['time_end_max'][3:]))
-                prg.t_min = (t_end_min-t_start).total_seconds()//60
-                prg.t_max = (t_end_max - t_start).total_seconds() // 60
-                prg.save()
-                return redirect('channel', prefix=prefix, chn=chn)
-        elif "id" in data.keys():
-            prg = Program.objects.get(channel=chan, id=data['id'])
-            if "delete" in data.keys():
-                prg.delete()
-                return redirect('channel', prefix=prefix, chn=chn)
-            prg.days = ''.join([str(i+1) for i in range(7) if f'days_{i}' in data.keys()])
-            if (prg.days != ''):
-                prg.hour = int(data['time_start'][:2])
-                prg.minute = int(data['time_start'][3:])
-                t_start = timedelta(hours=prg.hour, minutes=prg.minute)
-                t_end_min = timedelta(hours=int(data['time_end_min'][:2]), minutes=int(data['time_end_min'][3:]))
-                t_end_max = timedelta(hours=int(data['time_end_max'][:2]),
-                                      minutes=int(data['time_end_max'][3:]))
-                prg.t_min = (t_end_min-t_start).total_seconds()//60
-                prg.t_max = (t_end_max - t_start).total_seconds() // 60
-                prg.save()
-                return redirect('channel', prefix=prefix, chn=chn)
+        prgs.append(PrgData(pr.id, pr.days, pr.hour, pr.minute, *pr.get_weeks(), pr.t_min, pr.t_max))
+    if instance is not None:
+        if request.method == 'POST':
+            data = request.POST.dict()
+            print(data)
+            chan.season = int(data["seasonpc"])
+            chan.cmin = int(data["cmindeg"])
+            chan.cmax = int(data["cmaxdeg"])
+            chan.meandr_on = int(data["meandr_on"])
+            chan.meaoff_cmin = int(data["meaoff_cmin"])
+            chan.meaoff_cmax = int(data["meaoff_cmax"])
+            chan.press_on = float(data["press_on"])
+            chan.press_off = float(data["press_off"])
+            chan.lowlevel = "lowlevel" in data.keys()
+            chan.rainsens = "rainsens_on" in data.keys()
+            chan.tempsens = int(data["tempsens"])
+            chan.save()
 
     return render(request, 'main/channel.html',
                   {
                       'prefix': prefix,
-                      'lines_week': lines,
                       'chn': int(chn),
-                      'prgs': prgs
+                      'prgs': prgs,
+                      'prg_data_json': json.dumps([i.toDict() for i in prgs]),
+                      'cont': cont,
+                      'chan': chan,
                    })
 
