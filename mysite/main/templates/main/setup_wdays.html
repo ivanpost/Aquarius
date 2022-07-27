@@ -11,8 +11,22 @@
 	{% load static %}
 	<link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
+<script>
+	function all_days()
+	{
+		for (var i = 1; i < 8; i++)
+		{
+			document.getElementById("wd" + i.toString()).checked = true;
+		}
+	}
+
+	function save()
+	{
+		document.getElementById("prog_settings").submit();
+	}
+</script>
 <body>
-	<form id="prog_settings" action="#" method="post" enctype="multipart/form-data"></form>
+	<form id="prog_settings" method="post" enctype="multipart/form-data">{% csrf_token %}</form>
 	<div class="wrapper">
 
 		<div class="page">
@@ -24,8 +38,8 @@
 							<b>Программа полива</b>
 						</div>
 
-						<div class="mhead__channel">
-							<input type="text" name="channel_name" form="prog_settings" value="Канал 12" />
+						<div class="mhead__title">
+							<b>Канал {{ chn }}</b>
 						</div>
 
 						<div class="mhead__manual">
@@ -46,12 +60,12 @@
 
 								<div class="status__column wbas">
 									<div class="titlew"><br>Программа №<br></div>
-									<input type="number" name="prog_num" form="prog_settings" value="10" />
+									<div class="titlew"><br>{{ prg_num }}<br></div>
 								</div>
 
 								<div class="status__column wbas">
 									<div class="titlew">Время<br>включения<br></div>
-									<input type="time" name="prog_time" form="prog_settings" value="12:00" />
+									<input type="time" name="prog_time" form="prog_settings" value="{{ time }}" />
 								</div>
 
 								<div class="status__column">
@@ -62,12 +76,12 @@
 									<div class="status__row">
 										<div class="status__column wbas">
 											<div class="titlew">°C<br>min</div>
-											<input type="number" name="prog_cmin" form="prog_settings" value="15" />
+											<input type="number" name="prog_cmin" form="prog_settings" value="{{ t_min }}" />
 										</div>
 			
 										<div class="status__column wbas">
 											<div class="titlew">°C<br>max</div>
-											<input type="number" name="prog_cmax" form="prog_settings" value="25" />
+											<input type="number" name="prog_cmax" form="prog_settings" value="{{ t_max }}" />
 										</div>
 									</div>
 								</div>
@@ -82,35 +96,35 @@
 								<div class="wdbox">
 
 									<div class="wdbox__row">
-										<input type="checkbox" id="bige" name="wd1" form="prog_settings" value="1" />&nbsp; &nbsp;Понедельник
+										<input {% if d1 %}checked{% endif %} type="checkbox" id="wd1" name="wd1" form="prog_settings" value="1" />&nbsp; &nbsp;Понедельник
 									</div>
 
 									<div class="wdbox__row">
-										<input type="checkbox" id="bige" name="wd2" form="prog_settings" value="2" />&nbsp; &nbsp; Bторник
+										<input {% if d2 %}checked{% endif %} type="checkbox" id="wd2" name="wd2" form="prog_settings" value="2" />&nbsp; &nbsp; Bторник
 									</div>
 
 									<div class="wdbox__row">
-										<input type="checkbox" id="bige" name="wd3" form="prog_settings" value="3" />&nbsp; &nbsp; Среда
+										<input {% if d3 %}checked{% endif %} type="checkbox" id="wd3" name="wd3" form="prog_settings" value="3" />&nbsp; &nbsp; Среда
 									</div>
 
 									<div class="wdbox__row">
-										<input type="checkbox" id="bige" name="wd4" form="prog_settings" value="4" />&nbsp; &nbsp;Четверг
+										<input {% if d4 %}checked{% endif %} type="checkbox" id="wd4" name="wd4" form="prog_settings" value="4" />&nbsp; &nbsp;Четверг
 									</div>
 
 									<div class="wdbox__row">
-										<input type="checkbox" id="bige" name="wd5" form="prog_settings" value="5" />&nbsp; &nbsp; Пятница
+										<input {% if d5 %}checked{% endif %} type="checkbox" id="wd5" name="wd5" form="prog_settings" value="5" />&nbsp; &nbsp; Пятница
 									</div>
 
 									<div class="wdbox__row">
-										<input type="checkbox" id="bige" name="wd6" form="prog_settings" value="6" />&nbsp; &nbsp; Суббота
+										<input {% if d6 %}checked{% endif %} type="checkbox" id="wd6" name="wd6" form="prog_settings" value="6" />&nbsp; &nbsp; Суббота
 									</div>
 
 									<div class="wdbox__row">
-										<input type="checkbox" id="bige" name="wd7" form="prog_settings" value="7" />&nbsp; &nbsp; Воскресенье
+										<input {% if d7 %}checked{% endif %} type="checkbox" id="wd7" name="wd7" form="prog_settings" value="7" />&nbsp; &nbsp; Воскресенье
 									</div>
 
 									<div class="wdbox__row">
-										<button type="button" name="all_days" form="prog_settings">Все дни</button>
+										<button onClick="all_days()" type="button" name="all_days" form="prog_settings">Все дни</button>
 									</div>
 
 								</div>
@@ -125,11 +139,11 @@
 									</div>
 
 									<div class="wdbox__row">
-										<input type="checkbox" id="bige" name="chetn" form="prog_settings" value="2" />&nbsp; &nbsp; Четная
+										<input {% if even_week %}checked{% endif %} type="checkbox" name="even" form="prog_settings" value="2" />&nbsp; &nbsp; Четная
 									</div>
 
 									<div class="wdbox__row">
-										<input type="checkbox" id="bige" name="nechetn" form="prog_settings" value="3" />&nbsp; &nbsp; Нечетная
+										<input {% if odd_week %}checked{% endif %} type="checkbox" name="odd" form="prog_settings" value="3" />&nbsp; &nbsp; Нечетная
 									</div>
 
 									<div class="wdbox__row">&nbsp;</div>
@@ -145,7 +159,7 @@
 
 							<div class="status__column">
 								<div class="wdbox__row">
-									<button type="button" name="save_prog" form="prog_settings"><img src="/img/save.png" alt="Сохранить" title="Сохранить" width="80%"></button>
+									<button onClick="save()" type="button" name="save_prog" form="prog_settings"><img src="{% static 'img/save.png' %}" alt="Сохранить" title="Сохранить" width="80%"></button>
 								</div>
 							</div>
 

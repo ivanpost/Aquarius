@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 import json
 from typing import List
 from main.consumers import ControllerConsumer
+import threading
 def try_int(i):
     try:
         return int(i)
@@ -144,6 +145,7 @@ class ControllerV2Manager:
         prg.t_min = t_min
         prg.t_max = t_max
         prg.save()
+        self.command_send_channel(channel_num)
 
     def create_program(self, channel_num: int) -> Program:
         chan = Channel.objects.get(controller__prefix=self.data_model.prefix, number=channel_num)
@@ -162,17 +164,35 @@ class ControllerV2Manager:
         prg.t_min = 60
         prg.t_max = 120
         prg.save()
+        self.command_send_channel(channel_num)
         return prg
 
+    def command_send_channel(self, chn):
+        channel = Channel.objects.get(controller=self.data_model, number=chn)
+        chn_settings = [channel.cmin, channel.cmax, channel.meandr_on, channel.meaoff_cmin, channel.meaoff_cmax,
+                        int(channel.press_on * 10), int(channel.press_off * 10), 0, 0,
+                        channel.season, 0, 0, 0, int(channel.rainsens), channel.tempsens, 0, 0, 0, 0]
+        programs = Program.objects.filter(channel=channel)
+        prgs = []
+        for prg in programs:
+            days = int(''.join([(str(int(str(i) in prg.days))) for i in range(1, 8)]), 2)
+            prg_data = [days, prg.weeks, prg.hour, prg.minute, prg.t_min, prg.t_max]
+            prgs.append(".".join([str(i) for i in prg_data]))
+        str_data = ".".join([str(i) for i in chn_settings]) + "." + ".".join([str(i) for i in prgs])
+        self.send_command(f"0.{channel.number}.6", str_data)
 
-    def command_send_channels_and_programs(self) -> None:
-        pass
+    def _send_channels_and_programs_thread(self):
+        for chn in Channel.objects.filter(controller=self.data_model):
+            self.command_send_channel(chn)
+
+    def send_channels_and_programs(self) -> None:
+        thread = threading.Thread(target=self._send_channels_and_programs_thread)
+        thread.run()
 
     def command_get_channels_response(self, data: str, **kwargs) -> bool:
         self.blocked = True
 
         parsed_message = list(map(try_int, data.split(".")))
-
         return False
 
     def get_controller_properties(self) -> dict:

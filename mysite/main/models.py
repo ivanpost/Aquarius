@@ -60,7 +60,6 @@ class Channel(models.Model):
         return f"{self.controller.prefix} / {self.number}"
 
 
-
 class Program(models.Model):
     id = models.AutoField(primary_key=True)
     channel = models.ForeignKey('Channel', on_delete=models.CASCADE)

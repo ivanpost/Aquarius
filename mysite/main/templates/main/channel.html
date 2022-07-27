@@ -46,7 +46,7 @@
 
 </div>
 <script type="text/javascript">
-	const prg_url_pattern = "{% url 'program_edit' prefix chn '-to_replace-' %}";
+	const prg_url_pattern = "{% url 'program' prefix chn '-to_replace-' %}";
 	var programs_data_json = '{{ prg_data_json|safe }}'
 	var programs_data = JSON.parse(programs_data_json);
 

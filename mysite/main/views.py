@@ -258,6 +258,46 @@ def channels(request, prefix):
 
     channels = Channel.objects.filter(controller__prefix=prefix)
 
+@login_required()
+def program(request, prefix, chn, prg_num):
+    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+        return redirect("/")
+
+    instance = ControllerV2Manager.get_instance(prefix)
+    program = Program.objects.get(channel__controller__prefix=prefix, channel__number=chn, number=prg_num)
+    weeks = program.get_weeks()
+
+    if request.method == 'POST':
+        data = request.POST.dict()
+        days = "".join([str(i) for i in range(1, 8) if f"wd{i}" in data.keys()])
+        weeks = ("even" in data.keys(), "odd" in data.keys())
+        hour = int(data["prog_time"][:2])
+        minute = int(data["prog_time"][3:5])
+        t_min = int(data["prog_cmin"])
+        t_max = int(data["prog_cmax"])
+
+        instance.edit_or_add_program(chn, prg_num, days, weeks, hour, minute, t_min, t_max)
+        return redirect("channel", prefix, chn)
+
+    return render(request, "main/setup_wdays.html",
+                  {
+                      "prefix": prefix,
+                      "chn": chn,
+                      "prg_num": prg_num,
+                      "time": f"{program.hour:02}:{program.minute:02}",
+                      "t_min": program.t_min,
+                      "t_max": program.t_max,
+                      "d1": "1" in program.days,
+                      "d2": "2" in program.days,
+                      "d3": "3" in program.days,
+                      "d4": "4" in program.days,
+                      "d5": "5" in program.days,
+                      "d6": "6" in program.days,
+                      "d7": "7" in program.days,
+                      "even_week": weeks[0],
+                      "odd_week": weeks[1]
+                  })
+
 @login_required
 def channel(request, prefix, chn, create_prg=False):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
@@ -346,7 +386,6 @@ def channel(request, prefix, chn, create_prg=False):
     if instance is not None:
         if request.method == 'POST':
             data = request.POST.dict()
-            print(data)
             chan.season = int(data["seasonpc"])
             chan.cmin = int(data["cmindeg"])
             chan.cmax = int(data["cmaxdeg"])
@@ -358,6 +397,7 @@ def channel(request, prefix, chn, create_prg=False):
             chan.lowlevel = "lowlevel" in data.keys()
             chan.rainsens = "rainsens_on" in data.keys()
             chan.tempsens = int(data["tempsens"])
+            instance.command_send_channel(chan.number)
             chan.save()
 
     return render(request, 'main/channel.html',
