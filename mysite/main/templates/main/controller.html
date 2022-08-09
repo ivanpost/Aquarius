@@ -108,8 +108,17 @@
 		let channel_num = current_page * 10 + num;
 		window.location.replace(pattern.replace("-to_replace-", channel_num.toString()));
 	}
+
+	function block_while_downloading()
+	{
+		while (true)
+		{
+			window.confirm("Идет загрузка данных с контроллера. Подождите.");
+		}
+	}
 </script>
 <body>
+	<form id="main_form" action="#" method="post" enctype="multipart/form-data">{% csrf_token %}</form>
 	<div class="wrapper">
 
 		<div class="page">
@@ -168,28 +177,36 @@
 									Загрузка...
 								</div>
 							</div>
-
 						</div>
 
-						<div class="status__row">
+						<div class="status__row" style="height: 9%;">
 							<div class="status__column">
-								<div class="titleb">
+								<!--<div class="titleb">
 									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Каналы</a>
-								</div>
-
+								</div>-->
+								<button type="button" name="chname" form="main_form">Названия<br>каналов</button>								
 							</div>
+
 							<div class="status__column">
-								<div class="titleb">
+								<!--<div class="titleb">
 									<a href="{% url 'manual_activation_selector' prefix %}" class="myxhref">Ручное</a>
-								</div>
+								</div>-->
+
+								<button type="button" onclick="document.location='{% url 'manual_activation_selector' prefix %}'"><img src="{% static 'img/hand.png' %}" alt="Ручное упр" title="Ручное упр" height=80%></button>
 
 							</div>
+
 							<div class="status__column">
-								<div class="titleb">
+								<!--<div class="titleb">
 									<a href="{% url 'pause' prefix %}" class="myxhref">Пауза</a>
-								</div>
-
+								</div>-->
+								<button type="button" onclick="document.location='{% url 'pause' prefix %}'"><img src="{% static 'img/pause.png' %}" alt="Пауза" title="Пауза" height=65%></button>
 							</div>
+
+							<div class="status__column">
+								<button type="button" onclick="javascript:block_while_downloading()"><img src="{% static 'img/download.png' %}" alt="Скачать" title="Скачать" height=70%></button>
+							</div>
+
 						</div>
 
 						<div class="status__row">

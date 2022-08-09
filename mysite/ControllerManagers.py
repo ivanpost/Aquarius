@@ -27,7 +27,8 @@ class ControllerV2Manager:
     command_response_handlers: dict
 
     blocked: bool = False
-    packet: int = 0
+    packet: int = -1
+    stashed_data: list = []
     last_command: str
     data_model: Controller
     mqtt_manager: MQTTManager
@@ -181,18 +182,44 @@ class ControllerV2Manager:
         str_data = ".".join([str(i) for i in chn_settings]) + "." + ".".join([str(i) for i in prgs])
         self.send_command(f"0.{channel.number}.6", str_data)
 
-    def _send_channels_and_programs_thread(self):
-        for chn in Channel.objects.filter(controller=self.data_model):
-            self.command_send_channel(chn)
-
-    def send_channels_and_programs(self) -> None:
-        thread = threading.Thread(target=self._send_channels_and_programs_thread)
-        thread.run()
-
     def command_get_channels_response(self, data: str, **kwargs) -> bool:
-        self.blocked = True
+        bytes_in_packet = 35
+        total_packets = 27
 
+        self.blocked = True
         parsed_message = list(map(try_int, data.split(".")))
+        packet_number = parsed_message[0]
+        del parsed_message[0]
+        print(len(parsed_message))
+
+        if self.packet >= packet_number:
+            self.packet = -1
+            self.stashed_data = []
+            self.blocked = False
+            return True
+
+        missed_bytes = max((packet_number - self.packet - 1), 0) * bytes_in_packet
+        self.stashed_data += [0] * missed_bytes
+        self.stashed_data += parsed_message
+        self.packet = packet_number
+
+        if packet_number >= total_packets - 1:
+            print(f"Total: {len(self.stashed_data)}")
+            if len(self.stashed_data) < total_packets * bytes_in_packet:
+                self.stashed_data += [0] * (total_packets * bytes_in_packet - len(self.stashed_data))
+
+            skip_start = 10
+            self.stashed_data = self.stashed_data[skip_start:]
+
+            total_channels = 10
+            for i in range(total_channels):
+                pass
+
+            self.packet = -1
+            self.stashed_data = []
+            self.blocked = False
+            return True
+
         return False
 
     def get_controller_properties(self) -> dict:
@@ -287,6 +314,7 @@ class ControllerV2Manager:
 
     def on_connected(self, mqtt: MQTTManager):
         self.command_get_state()
+        #self.command_get_channels()
 
     def get_check_sum(self, *data: str) -> (int, int):
         check_sum = 0

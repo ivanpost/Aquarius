@@ -174,7 +174,7 @@ body {
 }
 .mbody .status__column {
   width: 50%;
-  align-items: center;
+  align-items: flex-start;
   overflow: hidden;
 }
 
@@ -227,6 +227,7 @@ body {
   padding: 10% 0;
   margin: 2% 2% 3% 2%;
   background-color: #4B0082;
+  height: 95%;
 }
 
 .titlew {
@@ -355,7 +356,6 @@ button[name=all_days] {
   font-size: 120%;
   font-weight: 700;
   line-height: 120%;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
 button[name=all_days]:hover {
   background: #2F4F4F;
@@ -364,39 +364,22 @@ button[name=all_days]:active {
   box-shadow: inset 3px 3px 10px 4px #7CFC00;
 }
 
-button[name=save_prog] {
+button {
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   background: #4B0082;
   cursor: pointer;
-  padding: 5% 30%;
-  margin: 5% 2%;
+  color: white;
+  margin: 3%;
   font-size: 120%;
   font-weight: 700;
   line-height: 120%;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+  height: 92%;
+  width: 92%;
 }
-button[name=save_prog]:hover {
+button:hover {
   background: #006400;
 }
-button[name=save_prog]:active {
-  box-shadow: inset 3px 3px 10px 4px #7CFC00;
-}
-
-button[name=manual] {
-  border: none;
-  border-radius: 4px;
-  background: #4B0082;
-  cursor: pointer;
-  padding: 5% 30%;
-  margin: 5% 2%;
-  font-size: 120%;
-  font-weight: 700;
-  line-height: 120%;
-}
-button[name=manual]:hover {
-  background: #006400;
-}
-button[name=manual]:active {
+button:active {
   box-shadow: inset 3px 3px 10px 4px #7CFC00;
 }/*# sourceMappingURL=style.css.map */
