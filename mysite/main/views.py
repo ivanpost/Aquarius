@@ -6,6 +6,7 @@ from operator import add
 from datetime import datetime, time, timedelta
 import time
 from ControllerManagers import ControllerV2Manager
+from main.consumers import ControllerConsumer
 import json
 
 DAYS = {'monday': 'Понедельник',
@@ -61,6 +62,8 @@ def reports(request):
 def pause(request, prefix, minutes: int = -1):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
         return redirect("/")
+    if ControllerV2Manager.check_block(prefix):
+        return redirect("controller", prefix)
 
     cont = Controller.objects.get(prefix=prefix)
     instance: ControllerV2Manager = ControllerV2Manager.get_instance(prefix)
@@ -82,6 +85,8 @@ def pause(request, prefix, minutes: int = -1):
 def manual_activation(request, prefix, chn, minutes=-1):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
         return redirect("/")
+    if ControllerV2Manager.check_block(prefix):
+        return redirect("controller", prefix)
 
     chn = int(chn)
 
@@ -111,6 +116,8 @@ def manual_activation(request, prefix, chn, minutes=-1):
 def manual_activation_selector(request, prefix, turn_off_all=False):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
         return redirect("/")
+    if ControllerV2Manager.check_block(prefix):
+        return redirect("controller", prefix)
 
     channels = Channel.objects.filter(controller__prefix=prefix)
     cont = Controller.objects.get(prefix=prefix)
@@ -262,6 +269,8 @@ def channels(request, prefix):
 def program(request, prefix, chn, prg_num):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
         return redirect("/")
+    if ControllerV2Manager.check_block(prefix):
+        return redirect("controller", prefix)
 
     instance = ControllerV2Manager.get_instance(prefix)
     program = Program.objects.get(channel__controller__prefix=prefix, channel__number=chn, number=prg_num)
@@ -302,6 +311,8 @@ def program(request, prefix, chn, prg_num):
 def channel(request, prefix, chn, create_prg=False):
     if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
         return redirect("/")
+    if ControllerV2Manager.check_block(prefix):
+        return redirect("controller", prefix)
     def get_day(start, l):
         out = []
         for i in range(24):

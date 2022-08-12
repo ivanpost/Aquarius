@@ -19,6 +19,7 @@
 	const PREFIX = "{{ prefix }}"
 	var channels_state = [];
 	var load_time = new Date();
+	var blocked = false;
 	var controller_time = new Date(load_time.getFullYear(), load_time.getMonth(), load_time.getDate(), 0, 0, 0);
 
 	function update_data_on_page(properties)
@@ -76,9 +77,15 @@
     socket.onmessage = function(event)
     {
     	var data = JSON.parse(event.data);
+    	console.log(data);
     	if (data["type"] == "properties")
     	{
     		update_data_on_page(data);
+    	}
+    	else if (data["type"] == "data_downloaded")
+    	{
+			alert("Данные загружены.");
+			location.reload()
     	}
 	};
 
@@ -109,12 +116,38 @@
 		window.location.replace(pattern.replace("-to_replace-", channel_num.toString()));
 	}
 
+	function GetStyleClass(className)
+    {
+       for (var i=0; i< document.styleSheets.length; i++) {
+          var styleSheet = document.styleSheets[i]
+
+          var rules = styleSheet.cssRules || styleSheet.rules
+
+          for (var j=0; j<rules.length; j++) {
+             var rule = rules[j]
+
+             if (rule.selectorText === className) {
+                return(rule.style)
+             }
+          }
+       }
+
+       return 0
+    }
+
 	function block_while_downloading()
 	{
-		while (true)
+		if (window.confirm("Приложение будет недоступно до окончания скачивания. Продолжить?"))
 		{
-			window.confirm("Идет загрузка данных с контроллера. Подождите.");
+			blocked = true;
+			socket.send(JSON.stringify({"prefix": PREFIX, "command": "download_data"}));
 		}
+		//document.querySelectorAll("button").forEach(b => b.disabled = true)
+		//GetStyleClass('a').pointerEvents = "none"
+		///while (blocked)
+		///{
+			//window.confirm("Идет загрузка данных с контроллера. Подождите.");
+		//}
 	}
 </script>
 <body>
