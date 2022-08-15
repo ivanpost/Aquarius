@@ -10,6 +10,12 @@
 	{% load static %}
 	<link rel="stylesheet" href="{% static 'css/style.css' %}">
 	{% include "includes/channels_selector_script.html" %}
+	<script type="text/javascript">
+		function save()
+		{
+			document.getElementById('channel_name').submit();
+		}
+	</script>
 </head>
 <body>
 	<form id="channel_name" action="#" method="post" enctype="multipart/form-data">{% csrf_token %}</form>
@@ -180,7 +186,7 @@
 
 							<div class="status__column">
 
-									<button type="button" onClick="document.getElementById('channel_name').submit(); document.location.replace('{% url 'controller' prefix %}')" name="save_prog" form="channel_name"><img src="{% static 'img/save.png' %}" alt="Сохранить" title="Сохранить" width="20%"></button>
+									<button type="button" onClick="javascript:save()" name="save_prog" form="channel_name"><img src="{% static 'img/save.png' %}" alt="Сохранить" title="Сохранить" width="20%"></button>
 							</div>
 						</div>
 

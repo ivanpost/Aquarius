@@ -158,9 +158,11 @@ def channel_naming(request, prefix):
                 if channel.name != data[f"chn{channel_number}_name"]:
                     channel.name = data[f"chn{channel_number}_name"]
                     channel.save()
+        return redirect("controller", prefix)
 
     return render(request, "main/channel_naming.html", {
         "cont": controller,
+        "prefix": prefix,
         "channels_names_json": [i.name for i in channels]
     })
 
@@ -438,6 +440,7 @@ def channel(request, prefix, chn, create_prg=False):
             chan.tempsens = int(data["tempsens"])
             instance.command_send_channel(chan.number)
             chan.save()
+            return redirect("controller", prefix)
 
     return render(request, 'main/channel.html',
                   {
