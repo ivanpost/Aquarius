@@ -57,7 +57,7 @@ class Channel(models.Model):
     tempsens = models.IntegerField(default=1)
 
     def __str__(self):
-        return f"{self.controller.prefix} / {self.number}"
+        return f"{self.controller.prefix} / {self.name}"
 
 
 class Program(models.Model):

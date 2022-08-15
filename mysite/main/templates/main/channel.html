@@ -11,6 +11,7 @@
 	{% load static %}
 	<link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
+{% include "includes/utils.html" %}
 <div style="display: none;">
 	<div id="prg_example" class="status__row">
 		<div class="status__column npp">
@@ -75,7 +76,7 @@
 		new_prg.querySelector('#prg_example_days').innerHTML = str_days;
 
 		new_prg.querySelector('#prg_example_time_start').href = new_prg_url;
-		new_prg.querySelector('#prg_example_time_start').innerHTML = prgData["t_start_hour"].toString() + ":" + prgData["t_start_minute"];
+		new_prg.querySelector('#prg_example_time_start').innerHTML = prgData["t_start_hour"].toString() + ":" + two_digits(prgData["t_start_minute"]);
 
 		new_prg.querySelector('#prg_example_t_min').href = new_prg_url;
 		new_prg.querySelector('#prg_example_t_min').innerHTML = prgData["t_min"].toString();
@@ -84,6 +85,12 @@
 		new_prg.querySelector('#prg_example_t_max').innerHTML = prgData["t_max"].toString();
 
 		programs.append(new_prg);
+	}
+
+	function set_pressure()
+	{
+		document.getElementById("press_on").value = ({{ chan.press_on }} / 10).toString();
+		document.getElementById("press_off").value = ({{ chan.press_off }} / 10).toString();
 	}
 
 	function create_program()
@@ -106,7 +113,7 @@
 				<div class="page__element page__head">
 				 	<div class="mhead">
 						<div class="mhead__title">Программирование</div>
-						<div class="mhead__channel">Канал 2</div>
+						<div class="mhead__channel">{{ chan.name }}</div>
 						<a target="_blank" href="https://hi-garden.ru/aqua2-manual" class="mhead__manual xhref">Menu</a>
 					 </div>
 				</div>
@@ -195,8 +202,8 @@
 								<div class="status__column" style="background-color: #2E8B57;">
 									<div class="titlew">
 										<p>Давление в<br>системе:</p>
-										<p>min <input style="width: 40%;" type="number" name="press_on" form="channel_settings" value="{{ chan.press_on }}" /></p>
-										<p>max<input style="width: 40%;"type="number" name="press_off" form="channel_settings" value="{{ chan.press_off }}" /></p>
+										<p>min <input id="press_on" style="width: 40%;" type="number" name="press_on" form="channel_settings" value="{% widthratio chan.press_on 10 1 %}" /></p>
+										<p>max<input id="press_off" style="width: 40%;"type="number" name="press_off" form="channel_settings" value="{% widthratio chan.press_off 10 1 %}" /></p>
 										<p>(атм)</p>
 									</div>
 								</div>
@@ -258,6 +265,7 @@
 			programs_data.forEach(function(item, i, arr) {
 				add_program(item);
 			});
+			set_pressure();
 		</script>
 </body>
 </html>

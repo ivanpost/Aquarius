@@ -1,7 +1,9 @@
 <script type="text/javascript">
 		let current_page = 0
+	    var channels_names = {{ channels_names_json|safe }};
+	    var channels_state = [];
 
-		function set_channels(page=current_page, meandrs=true)
+		function set_channels(page=current_page, meandrs=true, display_state=true)
 		{
 			for (var i = 0; i <= 2; i++)
 			{
@@ -17,25 +19,44 @@
 			for (var i = 1; i <= 10; i++)
 			{
 				let channel_number = page * 10 + i;
-				document.getElementById('chn' + i.toString()).innerHTML = "Канал "  + channel_number.toString();
-
-				if (channel_number < channels_state.length)
+				var name = "Канал " + channel_number.toString();
+				if (channel_number < channels_names.length)
 				{
-					var className = "titlev channeloff";
-					var classNameMeandr = "meandroff";
-
-					if (channels_state[channel_number - 1])
-					{
-						className = "titlev channelon";
-						classNameMeandr = "meandron";
-					}
-
-					document.getElementById('chn' + i.toString() + "_div").className = className;
-					if (meandrs)
-					{
-					    document.getElementById('chn' + i.toString() + "_meandr").className = classNameMeandr;
-					}
+				    name = channels_names[channel_number-1];
 				}
+
+				if (document.getElementById('chn' + i.toString()).tagName.toLowerCase() === 'input')
+				{
+				    document.getElementById('chn' + i.toString()).name = "chn" + channel_number.toString() + "_name";
+				    document.getElementById('chn' + i.toString()).value = name;
+				}
+				else
+				{
+				    document.getElementById('chn' + i.toString()).innerHTML = name;
+				}
+
+
+                if (display_state)
+                {
+                    if (channel_number < channels_state.length)
+				    {
+                        var className = "titlev channeloff";
+                        var classNameMeandr = "meandroff";
+
+                        if (channels_state[channel_number - 1])
+                        {
+                            className = "titlev channelon";
+                            classNameMeandr = "meandron";
+                        }
+
+                        document.getElementById('chn' + i.toString() + "_div").className = className;
+                        if (meandrs)
+                        {
+                            document.getElementById('chn' + i.toString() + "_meandr").className = classNameMeandr;
+                        }
+				    }
+                }
+
 			}
 			current_page = page;
 		}

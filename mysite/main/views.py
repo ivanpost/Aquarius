@@ -135,8 +135,34 @@ def manual_activation_selector(request, prefix, turn_off_all=False):
                   {
                       "prefix": prefix,
                       'channels_state_json': json.dumps([i.state for i in channels]),
+                      'channels_names_json': json.dumps([i.name for i in channels]),
                       "cont": cont,
                   })
+
+@login_required
+def channel_naming(request, prefix):
+    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+        return redirect("/")
+    if ControllerV2Manager.check_block(prefix):
+        return redirect("controller", prefix)
+
+    controller: Controller = Controller.objects.get(prefix=prefix)
+    channels = Channel.objects.filter(controller=controller)
+
+    if request.method == "POST":
+        data = request.POST.dict()
+        for k in data.keys():
+            if k.startswith("chn") and k.endswith("_name"):
+                channel_number = int(k.replace("chn", "").replace("_name", ""))
+                channel = channels.get(number=channel_number)
+                if channel.name != data[f"chn{channel_number}_name"]:
+                    channel.name = data[f"chn{channel_number}_name"]
+                    channel.save()
+
+    return render(request, "main/channel_naming.html", {
+        "cont": controller,
+        "channels_names_json": [i.name for i in channels]
+    })
 
 @login_required
 def controller(request, prefix):
@@ -189,13 +215,14 @@ def controller(request, prefix):
     cont = Controller.objects.get(prefix=prefix)
 
     class Line:
-        def __init__(self, status, data):
+        def __init__(self, name, status, data):
             self.status = status
+            self.name = name
             self.data = data
 
     lines = []
     for chn in channels:
-        lines.append(Line(chn.state, get_week(chn)))
+        lines.append(Line(chn.name, chn.state, get_week(chn)))
 
     return render(request, 'main/controller.html',
                   {
@@ -203,7 +230,8 @@ def controller(request, prefix):
                       'lines_week': lines,
                       'cont': cont,
                       'day': list(DAYS.values())[cont.day-1],
-                      'channels_state_json': json.dumps([i.status for i in lines])
+                      'channels_state_json': json.dumps([i.status for i in lines]),
+                      'channels_names_json': json.dumps([i.name for i in lines])
                     })
 
 @login_required

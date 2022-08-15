@@ -99,7 +99,7 @@ body {
   justify-content: space-between;
 }
 .page__footer {
-  height: 50px;
+  height: 15px;
   background-color: #006400;
 }
 .page__footer .fcontent {
@@ -312,13 +312,14 @@ body {
 input {
   width: 70%;
   color: #fff;
-  font-size: 150%;
+  font-size: 120%;
   font-weight: 700;
   margin: 4% 0;
-  padding-left: 5%;
+  padding-left: 1%;
   background-color: inherit;
   text-align: center;
   align-items: stretch;
+  width: 98%;
 }
 
 #bige {

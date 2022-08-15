@@ -194,73 +194,79 @@ class ControllerV2Manager:
         bytes_in_packet = 35
         total_packets = 27
 
-        self.blocked = True
-        data = data.split(".10.11.12.13.12.11.10")[0]
-        parsed_message = list(map(try_int, data.split(".")))
-        packet_number = parsed_message[0]
-        del parsed_message[0]
+        if True:
+            self.blocked = True
+            data = data.split(".10.11.12.13.12.11.10")[0]
+            parsed_message = list(map(try_int, data.split(".")))
+            packet_number = parsed_message[0]
+            del parsed_message[0]
 
-        if packet_number != self.packet + 1:
+            if packet_number != self.packet + 1 or len(parsed_message) != bytes_in_packet:
+                self.packet = -1
+                self.stashed_data = []
+                self.blocked = False
+                ControllerConsumer.send_data_downloaded()
+                return True
+
+            missed_bytes = max((packet_number - self.packet - 1), 0) * bytes_in_packet
+            self.stashed_data += [0] * missed_bytes
+            self.stashed_data += parsed_message
+            self.packet = packet_number
+            print(f"Packet: {packet_number}")
+
+            if packet_number >= total_packets - 1:
+                if len(self.stashed_data) < total_packets * bytes_in_packet:
+                    self.stashed_data += [0] * (total_packets * bytes_in_packet - len(self.stashed_data))
+
+                skip_start = 20
+                self.stashed_data = self.stashed_data[skip_start:]
+
+                total_channels = 10
+                bytes_for_channel = 20
+                for i in range(total_channels):
+                    offset = bytes_for_channel * i
+                    try:
+                        channel_model: Channel = Channel.objects.get(controller=self.data_model, number=i)
+                    except ObjectDoesNotExist:
+                        channel_model: Channel = Channel(controller=self.data_model, number=i, name=f"Канал {i}")
+
+                    channel_model.cmin, channel_model.cmax, channel_model.meandr_on, channel_model.meaoff_cmin, \
+                    channel_model.meaoff_cmax, channel_model.press_on, channel_model.press_off,\
+                    _, _, channel_model.season, _, _, _, channel_model.rainsens, channel_model.tempsens,\
+                    channel_model.lowlevel, _, _, _, _ = self.stashed_data[offset:offset+20]
+
+                    channel_model.save()
+
+                total_programs = 80
+                bytes_for_program = 8
+                for i in range(total_programs):
+                    offset = bytes_for_program * i + 220
+                    if self.stashed_data[offset] <= 0 or self.stashed_data[offset] >= total_programs:
+                        continue
+
+                    channel_model: Channel = Channel.objects.get(controller=self.data_model, number=self.stashed_data[offset]+1)
+                    try:
+                        program_model: Program = Program.objects.get(channel=channel_model, number=self.stashed_data[offset+1])
+                    except ObjectDoesNotExist:
+                        program_model: Program = Program(channel=channel_model, number=self.stashed_data[offset+1])
+
+                    program_model.days = ''.join([str(num+1) for num, j in enumerate(list("{0:b}".format(self.stashed_data[offset + 2]))) if bool(int(j))])
+                    program_model.weeks, program_model.hour, program_model.minute, program_model.t_min,\
+                    program_model.t_max = self.stashed_data[offset+3:offset+8]
+
+                    program_model.save()
+
+                ControllerConsumer.send_data_downloaded()
+                self.packet = -1
+                self.stashed_data = []
+                self.blocked = False
+                return True
+        '''except:
             self.packet = -1
             self.stashed_data = []
             self.blocked = False
             ControllerConsumer.send_data_downloaded()
-            return True
-
-        missed_bytes = max((packet_number - self.packet - 1), 0) * bytes_in_packet
-        self.stashed_data += [0] * missed_bytes
-        self.stashed_data += parsed_message
-        self.packet = packet_number
-        print(f"Packet: {packet_number}")
-
-        if packet_number >= total_packets - 1:
-            if len(self.stashed_data) < total_packets * bytes_in_packet:
-                self.stashed_data += [0] * (total_packets * bytes_in_packet - len(self.stashed_data))
-
-            skip_start = 20
-            self.stashed_data = self.stashed_data[skip_start:]
-
-            total_channels = 10
-            bytes_for_channel = 20
-            for i in range(total_channels):
-                offset = bytes_for_channel * i
-                try:
-                    channel_model: Channel = Channel.objects.get(controller=self.data_model, number=i+1)
-                except ObjectDoesNotExist:
-                    program_model: Program = Program(controller=self.data_model, number=i+1)
-
-                channel_model.cmin, channel_model.cmax, channel_model.meandr_on, channel_model.meaoff_cmin, \
-                channel_model.meaoff_cmax, channel_model.press_on, channel_model.press_off,\
-                _, _, channel_model.season, _, _, _, channel_model.rainsens, channel_model.tempsens,\
-                channel_model.lowlevel, _, _, _, _ = self.stashed_data[offset:offset+20]
-
-                channel_model.save()
-
-            total_programs = 80
-            bytes_for_program = 8
-            for i in range(total_programs):
-                offset = bytes_for_program * i + 220
-                if self.stashed_data[offset] <= 0 or self.stashed_data[offset] >= total_programs:
-                    continue
-
-                channel_model: Channel = Channel.objects.get(controller=self.data_model, number=self.stashed_data[offset]+1)
-                try:
-                    program_model: Program = Program.objects.get(channel=channel_model, number=self.stashed_data[offset+1])
-                except ObjectDoesNotExist:
-                    program_model: Program = Program(channel=channel_model, number=self.stashed_data[offset+1])
-
-                program_model.days = ''.join([str(num+1) for num, j in enumerate(list("{0:b}".format(self.stashed_data[offset + 2]))) if bool(int(j))])
-                program_model.weeks, program_model.hour, program_model.minute, program_model.t_min,\
-                program_model.t_max = self.stashed_data[offset+3:offset+8]
-
-                program_model.save()
-
-            ControllerConsumer.send_data_downloaded()
-            self.packet = -1
-            self.stashed_data = []
-            self.blocked = False
-            return True
-
+            return True'''
         return False
 
     def get_controller_properties(self) -> dict:

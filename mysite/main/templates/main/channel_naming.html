@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0">
+	<meta name="format-detection" content="telephone=no">
+	<title>Названия каналов</title>
+	<!--<link rel="stylesheet" href="css/style.css">-->
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+	{% include "includes/channels_selector_script.html" %}
+</head>
+<body>
+	<form id="channel_name" action="#" method="post" enctype="multipart/form-data">{% csrf_token %}</form>
+	<div class="wrapper">
+
+		<div class="page">
+			<div class="page__row">
+
+				<div class="page__head">
+				 <div class="mhead">
+					<div class="mhead__title">Названия каналов</Main></div>
+					<a target="_blank" href="https://hi-garden.ru/aqua2-manual" class="mhead__manual xhref">&#8942;</a>		 
+				 </div>
+			
+				</div>
+
+			  <div class="page__body">
+
+				<div class="mbody">
+
+					 <div class="status">
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlew"><br>&#8986; &nbsp; &nbsp; {{ cont.time|date:"G:i" }}</div>
+							</div>
+
+							<div class="status__column">
+								<div class="status__column">
+									<div class="titlew"><br>MQTT - {% if cont.esp_mqtt %}ОК{% else %}Нет подключения{% endif %}!</div>
+								</div>
+							</div>
+							
+						</div>
+
+						<div class="status__row">
+
+							
+							<div class="titlew">
+								Aquarius 294<br>Ягодное, Энерг 13
+							</div>
+
+
+						</div>
+
+
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlem">*</div>
+							</div>
+
+						</div>
+
+						<div class="status__row">
+							<div class="status__column">
+								<div id="chns_selector_0" class="titlef folderon">
+									<a  onClick="javascript:set_channels(0, false, false);" role="button" href="#" class="myxhref">Каналы 1-10<br></a>
+									<div id="chns_selector_0_status" class="chnon">1, 7, 10</div>
+								</div>
+								
+							</div>
+
+							<div class="status__column">
+								<div id="chns_selector_1" class="titlef folderoff">
+									<a onClick="javascript:set_channels(1, false, false);" role="button" href="#" class="myxhref">Каналы 11-20<br></a>
+									<div id="chns_selector_1_status" class="chnon">11, 14, 19</div>
+								</div>
+
+							</div>
+
+							<div class="status__column">
+								<div id="chns_selector_2" class="titlef folderoff">
+									<a onClick="javascript:set_channels(2, false, false);" role="button" href="#" class="myxhref">Каналы 21-30<br></a>
+									<div id="chns_selector_2_status" class="chnon">-</div>
+								</div>
+
+							</div>
+
+						</div>
+
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div id="chn1_div" class="titlev">
+									<input id="chn1" type="text" style="width: 100%;" name="chn1_name" form="channel_name" value="Канал 1" />
+								</div>
+								
+							</div>
+
+							<div class="status__column">
+								<div id="chn2_div" class="titlev">
+									<input id="chn2" type="text" name="chn2_name" form="channel_name" value="Канал 2" />
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div id="chn3_div" class="titlev">
+									<input id="chn3" type="text" name="chn3_name" form="channel_name" value="Канал 3" />
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div id="chn4_div" class="titlev">
+									<input id="chn4" type="text" name="chn4_name" form="channel_name" value="Канал 4" />
+								</div>
+							</div>
+
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div id="chn5_div" class="titlev">
+									<input id="chn5" type="text" name="chn5_name" form="channel_name" value="Канал 5" />
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div id="chn6_div" class="titlev">
+									<input id="chn6" type="text" name="chn6_name" form="channel_name" value="Канал 6" />
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div id="chn7_div" class="titlev">
+									<input id="chn7" type="text" name="chn7_name" form="channel_name" value="Канал 7" />
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div id="chn8_div" class="titlev">
+									<input id="chn8" type="text" name="chn8_name" form="channel_name" value="Канал 8" />
+								</div>
+							</div>
+
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlem">*</div>
+							</div>
+
+							<div class="status__column">
+								<div id="chn9_div" class="titlev">
+									<input id="chn9" type="text" name="chn9_name" form="channel_name" value="Канал 9" />
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div id="chn10_div" class="titlev">
+									<input id="chn10" type="text" name="chn10_name" form="channel_name" value="Канал 10" />
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlem">*</div>
+								
+							</div>
+
+						</div> 
+
+						<div class="status__row" style="height: 12%; width: 80%;">
+
+							<div class="status__column">
+
+									<button type="button" onClick="document.getElementById('channel_name').submit();" name="save_prog" form="channel_name"><img src="{% static 'img/save.png' %}" alt="Сохранить" title="Сохранить" width="20%"></button>
+							</div>
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlew">Esp: 1.9.3</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlew">And: site</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlew">Avr: 159</div>
+							</div>
+
+						</div> 
+					</div>
+
+				 </div>
+			  </div>
+
+			  <div class="page__footer">
+			  </div>
+			</div>
+	</div>
+		<script type="text/javascript">
+			set_channels(0, false, false);
+			set_channels_status();
+		</script>
+</body>
+</html>

@@ -8,6 +8,7 @@ urlpatterns = [
     path('reports/', views.reports, name='reports'),
     path('controllers/<str:prefix>', views.controller, name='controller'),
     path('controllers/<str:prefix>/pause', views.pause, name='pause'),
+    path('controllers/<str:prefix>/channel_naming', views.channel_naming, name='channel_naming'),
     path('controllers/<str:prefix>/pause/<int:minutes>', views.pause, name='pause'),
     path('controllers/<str:prefix>/channels/<str:chn>', views.channel, name='channel'),
     path('controllers/<str:prefix>/channels/<str:chn>/create_program', lambda r, prefix, chn: views.channel(r, prefix, chn, True), name='create_program'),

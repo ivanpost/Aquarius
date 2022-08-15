@@ -12,6 +12,7 @@
 	<link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 {% include "includes/channels_selector_script.html" %}
+{% include "includes/utils.html" %}
 <form name="set_time_form">
 	{% csrf_token %}
 </form>
@@ -19,7 +20,6 @@
 	const PREFIX = "{{ prefix }}"
 	var channels_state = [];
 	var load_time = new Date();
-	var blocked = false;
 	var controller_time = new Date(load_time.getFullYear(), load_time.getMonth(), load_time.getDate(), 0, 0, 0);
 
 	function update_data_on_page(properties)
@@ -28,7 +28,7 @@
 		{
 			controller_time = new Date(load_time.getFullYear(), load_time.getMonth(), load_time.getDate(), properties["hour"], properties["minute"], properties["second"]);
 
-			document.getElementById("controller_time").innerHTML = "&#8986; &nbsp; &nbsp; " + controller_time.getHours().toString() + ":" + controller_time.getMinutes().toString();
+			document.getElementById("controller_time").innerHTML = "&#8986; &nbsp; &nbsp; " + controller_time.getHours().toString() + ":" + two_digits(controller_time.getMinutes());
 
 			check_controller_time();
 		}
@@ -47,7 +47,7 @@
 
 		if (properties["next_time_hour"] != undefined & properties["next_time_minute"] != undefined)
 		{
-			document.getElementById("next_activation_time").innerHTML = "&#9200; &nbsp; &nbsp; " + properties["next_time_hour"].toString() + ":" + properties["next_time_minute"].toString();
+			document.getElementById("next_activation_time").innerHTML = "&#9200; &nbsp; &nbsp; " + properties["next_time_hour"].toString() + ":" + two_digits(properties["next_time_minute"]);
 		}
 
 		if (properties["next_chn"] != undefined)
@@ -77,7 +77,6 @@
     socket.onmessage = function(event)
     {
     	var data = JSON.parse(event.data);
-    	console.log(data);
     	if (data["type"] == "properties")
     	{
     		update_data_on_page(data);
@@ -116,25 +115,6 @@
 		window.location.replace(pattern.replace("-to_replace-", channel_num.toString()));
 	}
 
-	function GetStyleClass(className)
-    {
-       for (var i=0; i< document.styleSheets.length; i++) {
-          var styleSheet = document.styleSheets[i]
-
-          var rules = styleSheet.cssRules || styleSheet.rules
-
-          for (var j=0; j<rules.length; j++) {
-             var rule = rules[j]
-
-             if (rule.selectorText === className) {
-                return(rule.style)
-             }
-          }
-       }
-
-       return 0
-    }
-
 	function block_while_downloading()
 	{
 		if (window.confirm("Приложение будет недоступно до окончания скачивания. Продолжить?"))
@@ -142,12 +122,6 @@
 			blocked = true;
 			socket.send(JSON.stringify({"prefix": PREFIX, "command": "download_data"}));
 		}
-		//document.querySelectorAll("button").forEach(b => b.disabled = true)
-		//GetStyleClass('a').pointerEvents = "none"
-		///while (blocked)
-		///{
-			//window.confirm("Идет загрузка данных с контроллера. Подождите.");
-		//}
 	}
 </script>
 <body>
@@ -160,8 +134,8 @@
 				<div class="page__element page__head">
 				 <div class="mhead">
 					<a target="_blank" href="https://hi-garden.ru/" class="mhead__logo xhref">Hi-Garden</a>
-					<div class="mhead__title">Aquarius Main</Main></div>
-					<a target="_blank" href="https://hi-garden.ru/aqua2-manual" class="mhead__manual xhref">Menu</a>
+					<div class="mhead__title">Aquarius Главная</Main></div>
+					<a target="_blank" href="https://hi-garden.ru/aqua2-manual" class="mhead__manual xhref">&#8942;</a>
 				 </div>
 
 				</div>
@@ -214,25 +188,15 @@
 
 						<div class="status__row" style="height: 9%;">
 							<div class="status__column">
-								<!--<div class="titleb">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Каналы</a>
-								</div>-->
-								<button type="button" name="chname" form="main_form">Названия<br>каналов</button>								
+								<button type="button" onclick="document.location='{% url 'channel_naming' prefix %}'" name="chname" form="main_form">Названия<br>каналов</button>
 							</div>
 
 							<div class="status__column">
-								<!--<div class="titleb">
-									<a href="{% url 'manual_activation_selector' prefix %}" class="myxhref">Ручное</a>
-								</div>-->
-
 								<button type="button" onclick="document.location='{% url 'manual_activation_selector' prefix %}'"><img src="{% static 'img/hand.png' %}" alt="Ручное упр" title="Ручное упр" height=80%></button>
 
 							</div>
 
 							<div class="status__column">
-								<!--<div class="titleb">
-									<a href="{% url 'pause' prefix %}" class="myxhref">Пауза</a>
-								</div>-->
 								<button type="button" onclick="document.location='{% url 'pause' prefix %}'"><img src="{% static 'img/pause.png' %}" alt="Пауза" title="Пауза" height=65%></button>
 							</div>
 
@@ -272,6 +236,7 @@
 						<div class="status__row">
 
 							<div class="status__column">
+
 								<div id="chn1_div" class="titlev channeloff">
 									<a id="chn1" onClick="javascript:redirect_to_channel(1);" href="#" class="myxhref">Канал 1</a>
 									<div id="chn1_meandr" class="meandroff">_∏_∏_</div>
@@ -425,7 +390,7 @@
 
 			  <div class="page__element page__footer">
 				<div class="fcontent">
-					<a target="_blank" href="https://hi-garden.ru/" class="mhead__manual xhref">Контроллеры орошения</a>
+
 				</div>
 			  </div>
 			</div>
