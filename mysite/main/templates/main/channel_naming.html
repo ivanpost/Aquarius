@@ -180,7 +180,7 @@
 
 							<div class="status__column">
 
-									<button type="button" onClick="document.getElementById('channel_name').submit();" name="save_prog" form="channel_name"><img src="{% static 'img/save.png' %}" alt="Сохранить" title="Сохранить" width="20%"></button>
+									<button type="button" onClick="document.getElementById('channel_name').submit(); document.location.replace('{% url 'controller' prefix %}')" name="save_prog" form="channel_name"><img src="{% static 'img/save.png' %}" alt="Сохранить" title="Сохранить" width="20%"></button>
 							</div>
 						</div>
 

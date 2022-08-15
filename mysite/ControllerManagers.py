@@ -226,9 +226,9 @@ class ControllerV2Manager:
                 for i in range(total_channels):
                     offset = bytes_for_channel * i
                     try:
-                        channel_model: Channel = Channel.objects.get(controller=self.data_model, number=i)
+                        channel_model: Channel = Channel.objects.get(controller=self.data_model, number=i+1)
                     except ObjectDoesNotExist:
-                        channel_model: Channel = Channel(controller=self.data_model, number=i, name=f"Канал {i}")
+                        channel_model: Channel = Channel(controller=self.data_model, number=i+1, name=f"Канал {i+1}")
 
                     channel_model.cmin, channel_model.cmax, channel_model.meandr_on, channel_model.meaoff_cmin, \
                     channel_model.meaoff_cmax, channel_model.press_on, channel_model.press_off,\
@@ -244,7 +244,7 @@ class ControllerV2Manager:
                     if self.stashed_data[offset] <= 0 or self.stashed_data[offset] >= total_programs:
                         continue
 
-                    channel_model: Channel = Channel.objects.get(controller=self.data_model, number=self.stashed_data[offset]+1)
+                    channel_model: Channel = Channel.objects.get(controller=self.data_model, number=self.stashed_data[offset])
                     try:
                         program_model: Program = Program.objects.get(channel=channel_model, number=self.stashed_data[offset+1])
                     except ObjectDoesNotExist:
