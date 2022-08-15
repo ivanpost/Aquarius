@@ -338,7 +338,7 @@ class ControllerV2Manager:
             self.data_model.esp_net = esp_d[2]
             self.data_model.esp_mqtt = esp_d[3]
             self.data_model.esp_errors = esp_d[4]
-            self.data_model.pressure = s[36]
+            self.data_model.pressure = s[36] - 10
             self.data_model.stream = s[37]
             self.data_model.num = f"{s[39]}-{s[40]}"
 

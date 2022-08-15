@@ -21,9 +21,21 @@
 	var channels_state = [];
 	var load_time = new Date();
 	var controller_time = new Date(load_time.getFullYear(), load_time.getMonth(), load_time.getDate(), 0, 0, 0);
+	var paused = false;
+
 
 	function update_data_on_page(properties)
 	{
+		if (properties["pause"] == true)
+		{
+			document.getElementById("mbody").style.backgroundColor = "#deca71";
+		}
+		else
+		{
+			document.getElementById("mbody").style.backgroundColor = "#2F4F4F";
+		}
+
+
 		if (properties["hour"] != undefined & properties["minute"] != undefined & properties["second"] != undefined)
 		{
 			controller_time = new Date(load_time.getFullYear(), load_time.getMonth(), load_time.getDate(), properties["hour"], properties["minute"], properties["second"]);
@@ -55,6 +67,16 @@
 			document.getElementById("next_activation_channel").innerHTML = "Канал " + properties["next_chn"].toString();
 		}
 
+		if (properties["pressure"] != undefined)
+		{
+			document.getElementById("pressure").innerHTML = (properties["pressure"] / 10).toString();
+		}
+
+		if (properties["stream"] != undefined)
+		{
+			document.getElementById("stream").innerHTML = properties["stream"].toString();
+		}
+
 		if (properties["channels_state"] != undefined)
 		{
 			channels_state = properties["channels_state"];
@@ -62,6 +84,10 @@
 			set_channels_status();
 		}
 	}
+
+	var intervalId = window.setInterval(function(){
+  		socket.send(JSON.stringify({"prefix": PREFIX, "command": "get_properties"}));
+	}, 30000);
 
 	const socket = new WebSocket(
             'ws://'
@@ -142,7 +168,7 @@
 
 			  <div class="page__element page__body">
 
-				<div class="mbody">
+				<div id="mbody" class="mbody">
 
 					 <div class="status">
 
@@ -342,14 +368,14 @@
 									<img src="{% static 'img/pressw.png' %}" width="80%"  alt="">
 								</div>
 
-								<div class="titlew">2,5</div>
+								<div id="pressure" class="titlew">Загрузка...</div>
 							</div>
 
 							<div class="status__column">
 								<div class="imgsm">
 									<img src="{% static 'img/potok.png' %}" width="80%"  alt="">
 								</div>
-								<div class="titlew">{{ cont.pressure }}</div>
+								<div id="stream" class="titlew">Загрузка...</div>
 							</div>
 
 							<div class="status__column">

@@ -48,6 +48,9 @@ class ControllerConsumer(WebsocketConsumer):
 
         if command == "download_data":
             instance.command_get_channels()
+        elif command == "get_properties":
+            print("command get properties")
+            instance.command_get_state()
 
 
 
