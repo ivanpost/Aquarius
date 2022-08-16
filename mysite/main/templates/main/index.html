@@ -19,7 +19,7 @@
 {% if controllers|length > 0 %}
 <ul>
     {% for cont in controllers %}
-    <li><a href="controllers/{{ cont.prefix }}">Контроллер {{ cont.prefix }}</a></li>
+    <li><a href="controllers/{{ cont.prefix }}">{{ cont.name }}</a></li>
     {% endfor %}
 </ul>
 {% else %}
