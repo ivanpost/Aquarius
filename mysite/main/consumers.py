@@ -23,7 +23,6 @@ class ControllerConsumer(WebsocketConsumer):
     def send_data_downloaded(prefix):
         from main.models import Controller
         from ControllerManagers import ControllerV2Manager
-        print("Send data downloaded")
         if prefix in ControllerConsumer.consumers.keys():
             ControllerConsumer.consumers[prefix].send(text_data=json.dumps({"type": "data_downloaded"}))
 
@@ -48,15 +47,15 @@ class ControllerConsumer(WebsocketConsumer):
 
         command = json_data["command"]
         instance = ControllerV2Manager.get_instance(prefix)
-        print(f"Instance prefix: {instance.prefix}")
         if instance is None:
             self.send(text_data=json.dumps({'error': "invalid prefix"}))
 
         if command == "download_data":
             instance.command_get_channels()
         elif command == "get_properties":
-            print("command get properties")
             instance.command_get_state()
+        elif command == "set_name" and "data" in json_data.keys():
+            instance.set_name(json_data["data"])
 
 
 

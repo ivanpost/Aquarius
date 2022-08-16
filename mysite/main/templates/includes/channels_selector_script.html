@@ -2,6 +2,7 @@
 		let current_page = 0
 	    var channels_names = {{ channels_names_json|safe }};
 	    var channels_state = [];
+	    var channels_meandrs = [];
 
 		function set_channels(page=current_page, meandrs=true, display_state=true)
 		{
@@ -38,7 +39,7 @@
 
                 if (display_state)
                 {
-                    if (channel_number < channels_state.length)
+                    if (channel_number <= channels_state.length)
 				    {
                         var className = "titlev channeloff";
                         var classNameMeandr = "meandroff";
@@ -50,7 +51,7 @@
                         }
 
                         document.getElementById('chn' + i.toString() + "_div").className = className;
-                        if (meandrs)
+                        if (meandrs & channel_number <= channels_meandrs.length & channels_meandrs[channel_number-1])
                         {
                             document.getElementById('chn' + i.toString() + "_meandr").className = classNameMeandr;
                         }

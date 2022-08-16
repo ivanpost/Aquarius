@@ -32,7 +32,6 @@ class MQTTManager:
     def subscribe(self, topic, func):
         self.topicHandlers[topic] = func
         self.client.subscribe(self.prefix + topic)
-        print(f"After subscribe {self.user}: {self.topicHandlers}")
 
     def on_connected(self, client, userdata, flags, rc):
         if self.trying > 0:
@@ -64,10 +63,9 @@ class MQTTManager:
 
 
     def on_message(self, userdata, message):
-        print(f'MQTT ({self.user}) - [{message.topic.replace(self.prefix, "")}] - {str(message.payload.decode("utf-8")).strip()}')
+        #print(f'MQTT ({self.user}) - [{message.topic.replace(self.prefix, "")}] - {str(message.payload.decode("utf-8")).strip()}')
         if message.topic.replace(self.prefix, '') in self.topicHandlers.keys():
             self.topicHandlers[message.topic.replace(self.prefix, "")](self, self.user, str(message.payload.decode("utf-8")).strip())
-        print(self.topicHandlers)
 
     def __init__(self, user, password):
         self.topicHandlers = {}

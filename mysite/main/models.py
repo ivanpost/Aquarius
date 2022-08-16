@@ -32,7 +32,7 @@ class Controller(models.Model):
     esp_errors = models.BooleanField(default=False)
     pressure = models.FloatField(default=0)
     stream = models.FloatField(default=0)
-    num = models.CharField(max_length=12, default="0-0")
+    name = models.CharField(max_length=64, default="Controller")
 
 
     def __str__(self):

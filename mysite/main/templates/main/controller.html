@@ -19,6 +19,7 @@
 <script type="text/javascript">
 	const PREFIX = "{{ prefix }}"
 	var channels_state = [];
+	var channels_meandrs = [];
 	var load_time = new Date();
 	var controller_time = new Date(load_time.getFullYear(), load_time.getMonth(), load_time.getDate(), 0, 0, 0);
 	var paused = false;
@@ -77,12 +78,23 @@
 			document.getElementById("stream").innerHTML = properties["stream"].toString();
 		}
 
+		if (properties["channels_meandrs"] != undefined)
+		{
+			channels_meandrs = properties["channels_meandrs"];
+		}
+
 		if (properties["channels_state"] != undefined)
 		{
 			channels_state = properties["channels_state"];
 			set_channels();
 			set_channels_status();
 		}
+
+		if (properties["name"] != undefined & !(document.activeElement === document.getElementById("controller_name")))
+		{
+			document.getElementById("controller_name").value = properties["name"].toString();
+		}
+
 	}
 
 	var intervalId = window.setInterval(function(){
@@ -99,6 +111,7 @@
 	{
 	  	socket.send(JSON.stringify({"prefix": PREFIX, "command": "get_properties"}));
 	};
+
 
     socket.onmessage = function(event)
     {
@@ -149,6 +162,12 @@
 			socket.send(JSON.stringify({"prefix": PREFIX, "command": "download_data"}));
 		}
 	}
+
+	function save_name()
+	{
+		var name = document.getElementById("controller_name").value;
+		socket.send(JSON.stringify({"prefix": PREFIX, "command": "set_name", "data": name}));
+	}
 </script>
 <body>
 	<form id="main_form" action="#" method="post" enctype="multipart/form-data">{% csrf_token %}</form>
@@ -176,41 +195,23 @@
 
 							<div class="status__column">
 								<div id="controller_time" class="titlew">&#8986; &nbsp; &nbsp; Загрузка...</div>
+								<div id="mqtt_status" class="titlew">MQTT - Загрузка...</div>
+								<div class="titlew" style="margin-top: 20px; margin-bottom: 0px;">
+									Aquarius {{ prefix }}
+								</div>
+								<input id="controller_name" type="text" style="width: 100%;" name="contr_name" value="Загрузка..." />
 							</div>
 
 							<div class="status__column">
 								<div class="titlew">Следующее<br>включение</div>
-							</div>
-
-						</div>
-
-						<div class="status__row">
-
-							<div class="status__column">
-								<div id="mqtt_status" class="titlew">MQTT - Загрузка...</div>
-							</div>
-
-							<div class="status__column">
 								<div id="next_activation_time" class="titlew">&#9200; &nbsp; &nbsp; Загрузка...</div>
-							</div>
-
-						</div>
-
-
-						<div class="status__row">
-
-							<div class="status__column">
-								<div class="titlew">
-									Aquarius 294<br>Ягодное, Энерг 13
-								</div>
-							</div>
-
-							<div class="status__column">
 								<div id="next_activation_channel" class="titlew">
 									Загрузка...
 								</div>
 							</div>
+
 						</div>
+
 
 						<div class="status__row" style="height: 9%;">
 							<div class="status__column">
@@ -422,7 +423,9 @@
 			</div>
 	</div>
 		<script type="text/javascript">
-
+			document.getElementById("controller_name").addEventListener('change', (event) => {
+			  save_name();
+			});
 		</script>
 </body>
 </html>

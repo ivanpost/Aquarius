@@ -86,7 +86,7 @@ class ControllerV2Manager:
         try:
             self.data_model = Controller.objects.get(prefix=controller_prefix)
         except:
-            self.data_model = Controller(prefix=controller_prefix, password=password)
+            self.data_model = Controller(prefix=controller_prefix, password=password, name=f"Контроллер {controller_prefix}")
             self.data_model.save()
 
         for channel_num in range(1, 31):
@@ -298,11 +298,16 @@ class ControllerV2Manager:
             "esp_errors": self.data_model.esp_errors,
             "pressure": self.data_model.pressure,
             "stream": self.data_model.stream,
-            "num": self.data_model.num,
-            "channels_state": channels_state
+            "name": self.data_model.name,
+            "channels_state": channels_state,
+            "channels_meandrs": [i.meaoff_cmin != 0 or i.meaoff_cmax != 0 for i in channels],
         }
 
         return properties
+
+    def set_name(self, name: str):
+        self.data_model.name = name
+        self.data_model.save()
 
     def command_get_state(self) -> None:
         self.send_command("8.8.8.8.8.8.8.8")
@@ -353,7 +358,6 @@ class ControllerV2Manager:
                         db_chns[c].state = s
                         db_chns[c].save()
             self.data_model.save()
-            print(self.prefix)
             ControllerConsumer.send_properties(self.prefix, self.get_controller_properties())
 
             return False
@@ -374,7 +378,6 @@ class ControllerV2Manager:
         return check_sum_bytes[0], check_sum_bytes[1]
 
     def handle_message(self, mqtt: MQTTManager, controller_prefix: str, data: str) -> None:
-        print(f"Handle message: {controller_prefix} - {self.prefix}")
         if self.last_command in self.command_response_handlers.keys():
             if self.command_response_handlers[self.last_command](data.replace(".1.2.3.4.3.2.1.", "").replace(".9.8.7.6.7.8.9..", ""), old_data=data):
                 self.last_command = ""
