@@ -32,11 +32,13 @@ def index(request):
     print(saved_controllers)
     if request.method == "POST":
         values = request.POST.dict()
+        print(f"POST; Data: {values}")
         if "user" in values.keys() and "password" in values.keys():
-            if ControllerV2Manager.check_auth(values["user"], values["password"]):
-                if ControllerV2Manager.add(values["user"], values["password"]):
-                    saved_controllers.append([values["user"], values["password"]])
-
+            print("Contains keys")
+            if ControllerV2Manager.add(values["user"], values["password"]):
+                print("Add: OK")
+                saved_controllers.append([values["user"], values["password"]])
+                print(f"New saved_controllers: {saved_controllers}")
 
     controllers = []
     _remove = []
@@ -50,6 +52,7 @@ def index(request):
                     {
                         'controllers': controllers
                     })
+    print(saved_controllers)
     request.user.userextension.saved_controllers = json.dumps(saved_controllers)
     request.user.userextension.save()
     return response

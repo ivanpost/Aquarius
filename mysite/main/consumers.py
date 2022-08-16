@@ -4,33 +4,36 @@ from channels.generic.websocket import WebsocketConsumer
 
 class ControllerConsumer(WebsocketConsumer):
 
-    consumers = []
+    consumers = {}
     name = 'controller'
 
     def connect(self):
         self.accept()
-        ControllerConsumer.consumers.append(self)
 
     def disconnect(self, close_code):
-        ControllerConsumer.consumers.remove(self)
+        to_delete = []
+        for k, v in ControllerConsumer.consumers.items():
+            if v == self:
+                to_delete.append(k)
+
+        for k in to_delete:
+            del ControllerConsumer.consumers[k]
 
     @staticmethod
-    def send_data_downloaded():
+    def send_data_downloaded(prefix):
         from main.models import Controller
         from ControllerManagers import ControllerV2Manager
         print("Send data downloaded")
-        for cons in ControllerConsumer.consumers:
-            cons.send(text_data=json.dumps({"type": "data_downloaded"}))
+        if prefix in ControllerConsumer.consumers.keys():
+            ControllerConsumer.consumers[prefix].send(text_data=json.dumps({"type": "data_downloaded"}))
 
     @staticmethod
-    def send_properties(properties):
+    def send_properties(prefix, properties):
         from main.models import Controller
         from ControllerManagers import ControllerV2Manager
-
-
         properties["type"] = "properties"
-        for cons in ControllerConsumer.consumers:
-            cons.send(text_data=json.dumps(properties))
+        if prefix in ControllerConsumer.consumers.keys():
+            ControllerConsumer.consumers[prefix].send(text_data=json.dumps(properties))
 
     def receive(self, text_data=None, bytes_data=None):
         from main.models import Controller
@@ -41,8 +44,11 @@ class ControllerConsumer(WebsocketConsumer):
             self.send(text_data=json.dumps({'error': "invalid syntax"}))
 
         prefix = json_data["prefix"]
+        ControllerConsumer.consumers[prefix] = self
+
         command = json_data["command"]
         instance = ControllerV2Manager.get_instance(prefix)
+        print(f"Instance prefix: {instance.prefix}")
         if instance is None:
             self.send(text_data=json.dumps({'error': "invalid prefix"}))
 

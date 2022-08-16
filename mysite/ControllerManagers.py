@@ -107,6 +107,7 @@ class ControllerV2Manager:
         ControllerV2Manager.instances[self.prefix] = self
 
     def subscribe(self, mqtt: MQTTManager) -> None:
+        print(f"Subscribe: {self.prefix}")
         mqtt.subscribe(self.topic_receive, self.handle_message)
         mqtt.onConnected = self.on_connected
 
@@ -205,7 +206,7 @@ class ControllerV2Manager:
                 self.packet = -1
                 self.stashed_data = []
                 self.blocked = False
-                ControllerConsumer.send_data_downloaded()
+                ControllerConsumer.send_data_downloaded(self.prefix)
                 return True
 
             missed_bytes = max((packet_number - self.packet - 1), 0) * bytes_in_packet
@@ -256,7 +257,7 @@ class ControllerV2Manager:
 
                     program_model.save()
 
-                ControllerConsumer.send_data_downloaded()
+                ControllerConsumer.send_data_downloaded(self.prefix)
                 self.packet = -1
                 self.stashed_data = []
                 self.blocked = False
@@ -352,11 +353,12 @@ class ControllerV2Manager:
                         db_chns[c].state = s
                         db_chns[c].save()
             self.data_model.save()
-
-            ControllerConsumer.send_properties(self.get_controller_properties())
+            print(self.prefix)
+            ControllerConsumer.send_properties(self.prefix, self.get_controller_properties())
 
             return False
-        except:
+        except BaseException as ex:
+            print(ex)
             return True
 
     def on_connected(self, mqtt: MQTTManager):
@@ -372,6 +374,7 @@ class ControllerV2Manager:
         return check_sum_bytes[0], check_sum_bytes[1]
 
     def handle_message(self, mqtt: MQTTManager, controller_prefix: str, data: str) -> None:
+        print(f"Handle message: {controller_prefix} - {self.prefix}")
         if self.last_command in self.command_response_handlers.keys():
             if self.command_response_handlers[self.last_command](data.replace(".1.2.3.4.3.2.1.", "").replace(".9.8.7.6.7.8.9..", ""), old_data=data):
                 self.last_command = ""

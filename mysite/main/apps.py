@@ -18,4 +18,3 @@ class MainConfig(AppConfig):
         for c in Controller.objects.all():
             ControllerV2Manager.add(c.prefix, c.password)
 
-
