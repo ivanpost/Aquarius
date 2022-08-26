@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-wk*0f1sf(+!)dsh9()8ao+fon#mx=t$k6bty-rq!#txyuna-_('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG")
 
 ALLOWED_HOSTS = ["192.168.137.1", "hd.tlt.ru", "127.0.0.1"]
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_registration'
 ]
 
 MIDDLEWARE = [
@@ -106,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 
@@ -132,3 +133,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 ASGI_APPLICATION = 'mysite.asgi.application'
 
+ACCOUNT_ACTIVATION_DAYS = 1 # кол-во дней для хранения кода активации
+
+AUTH_USER_EMAIL_UNIQUE = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = os.environ.get("DJANGO_REGISTRATION_EMAIL_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("DJANGO_REGISTRATION_EMAIL_PASSWORD")
+EMAIL_USE_TLS = True
+EMAIL_FROM = 'no-reply@hd.tlt.ru'

@@ -82,7 +82,7 @@ body {
 }
 
 .wrapper {
-  height: 98%;
+  height: 92%;
 }
 
 .page {
@@ -164,6 +164,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: stretch;
+}
+.mbody .status__rowc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 .mbody .status__table {
   flex: 1 1 auto;
@@ -322,6 +327,12 @@ input {
   width: 98%;
 }
 
+input[type=submit] {
+  background: #4B0082;
+  width: 40%;
+  margin-left: 20%;
+}
+
 #bige {
   transform: scale(2);
   opacity: 0.9;
@@ -357,6 +368,7 @@ button[name=all_days] {
   font-size: 120%;
   font-weight: 700;
   line-height: 120%;
+  width: 80%;
 }
 button[name=all_days]:hover {
   background: #2F4F4F;
@@ -377,10 +389,24 @@ button {
   line-height: 120%;
   height: 92%;
   width: 92%;
+  padding: 10px;
 }
 button:hover {
   background: #006400;
 }
 button:active {
   box-shadow: inset 3px 3px 10px 4px #7CFC00;
+}
+
+table {
+  cursor: pointer;
+  color: white;
+  margin: 3%;
+  font-size: 120%;
+  font-weight: 700;
+  line-height: 120%;
+}
+
+td {
+  padding: 15px 15px;
 }/*# sourceMappingURL=style.css.map */
