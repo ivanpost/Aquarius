@@ -29,17 +29,14 @@ def index(request):
         saved_controllers = []
     else:
         saved_controllers = json.loads(saved_controllers)
-    print(saved_controllers)
     if request.method == "POST":
         values = request.POST.dict()
-        print(f"POST; Data: {values}")
-        if "user" in values.keys() and "password" in values.keys():
-            print("Contains keys")
-            if ControllerV2Manager.add(values["user"], values["password"]):
-                print("Add: OK")
+        if all(k in values.keys() for k in ("server", "port", "user", "password", "prefix")):
+            print({k: values[k] for k in ["cname", "email"] if k in values.keys()})
+            if ControllerV2Manager.add(values["user"], values["password"],
+                                       host=values["server"], port=int(values["port"]), prefix=values["prefix"],
+                                       **{k: values[k] for k in ["cname", "email"] if k in values.keys()}):
                 saved_controllers.append([values["user"], values["password"]])
-                print(f"New saved_controllers: {saved_controllers}")
-
     controllers = []
     _remove = []
     for c in saved_controllers:
@@ -52,7 +49,7 @@ def index(request):
                     {
                         'controllers': controllers
                     })
-    print(saved_controllers)
+
     request.user.userextension.saved_controllers = json.dumps(saved_controllers)
     request.user.userextension.save()
     return response
@@ -62,94 +59,94 @@ def reports(request):
     return render(request, 'main/reports.html')
 
 @login_required
-def pause(request, prefix, minutes: int = -1):
-    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+def pause(request, mqtt_user, minutes: int = -1):
+    if not ControllerV2Manager.check_auth(mqtt_user=mqtt_user, user=request.user):
         return redirect("/")
-    if ControllerV2Manager.check_block(prefix):
-        return redirect("controller", prefix)
+    if ControllerV2Manager.check_block(mqtt_user):
+        return redirect("controller", mqtt_user)
 
-    cont = Controller.objects.get(prefix=prefix)
-    instance: ControllerV2Manager = ControllerV2Manager.get_instance(prefix)
+    cont = Controller.objects.get(mqtt_user=mqtt_user)
+    instance: ControllerV2Manager = ControllerV2Manager.get_instance(mqtt_user)
 
     if minutes > -1:
         instance.command_pause(minutes)
         instance.command_get_state()
-        return redirect("controller", prefix=prefix)
+        return redirect("controller", mqtt_user=mqtt_user)
 
     return render(request,
                   "main/pause_activation.html",
                   {
-                      "prefix": prefix,
+                      "mqtt_user": mqtt_user,
                       "cont": cont,
                   })
 
 
 @login_required
-def manual_activation(request, prefix, chn, minutes=-1):
-    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+def manual_activation(request, mqtt_user, chn, minutes=-1):
+    if not ControllerV2Manager.check_auth(mqtt_user=mqtt_user, user=request.user):
         return redirect("/")
-    if ControllerV2Manager.check_block(prefix):
-        return redirect("controller", prefix)
+    if ControllerV2Manager.check_block(mqtt_user):
+        return redirect("controller", mqtt_user)
 
     chn = int(chn)
 
-    channel = Channel.objects.filter(controller__prefix=prefix, number=chn)
+    channel = Channel.objects.filter(controller__mqtt_user=mqtt_user, number=chn)
     if len(channel) > 0:
         channel = channel[0]
     else:
         return redirect("/")
-    cont = Controller.objects.get(prefix=prefix)
-    instance: ControllerV2Manager = ControllerV2Manager.get_instance(prefix)
+    cont = Controller.objects.get(mqtt_user=mqtt_user)
+    instance: ControllerV2Manager = ControllerV2Manager.get_instance(mqtt_user)
 
     if minutes > -1:
         instance.command_turn_on_channel(chn, minutes)
         instance.command_get_state()
-        return redirect("controller", prefix=prefix)
+        return redirect("controller", mqtt_user=mqtt_user)
 
     return render(request,
                   "main/manual_activation.html",
                   {
-                      "prefix": prefix,
+                      "mqtt_user": mqtt_user,
                       "cont": cont,
                       "chn": chn,
                   })
 
 
 @login_required
-def manual_activation_selector(request, prefix, turn_off_all=False):
-    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+def manual_activation_selector(request, mqtt_user, turn_off_all=False):
+    if not ControllerV2Manager.check_auth(mqtt_user=mqtt_user, user=request.user):
         return redirect("/")
-    if ControllerV2Manager.check_block(prefix):
-        return redirect("controller", prefix)
+    if ControllerV2Manager.check_block(mqtt_user):
+        return redirect("controller", mqtt_user)
 
-    channels = Channel.objects.filter(controller__prefix=prefix)
-    cont = Controller.objects.get(prefix=prefix)
+    channels = Channel.objects.filter(controller__mqtt_user=mqtt_user)
+    cont = Controller.objects.get(mqtt_user=mqtt_user)
 
-    instance: ControllerV2Manager = ControllerV2Manager.get_instance(prefix)
+    instance: ControllerV2Manager = ControllerV2Manager.get_instance(mqtt_user)
     instance.command_get_state()
     if turn_off_all:
         if instance is not None:
             instance.turn_off_all_channels()
             instance.command_get_state()
-            return redirect("controller", prefix=prefix)
+            return redirect("controller", mqtt_user=mqtt_user)
 
     return render(request,
                   "main/manual_activation_selector.html",
                   {
-                      "prefix": prefix,
+                      "mqtt_user": mqtt_user,
                       'channels_state_json': json.dumps([i.state for i in channels]),
                       'channels_names_json': json.dumps([i.name for i in channels]),
                       "cont": cont,
                   })
 
 @login_required
-def channel_naming(request, prefix):
-    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+def channel_naming(request, mqtt_user):
+    if not ControllerV2Manager.check_auth(mqtt_user=mqtt_user, user=request.user):
         return redirect("/")
-    if ControllerV2Manager.check_block(prefix):
-        return redirect("controller", prefix)
+    if ControllerV2Manager.check_block(mqtt_user):
+        return redirect("controller", mqtt_user)
 
-    controller: Controller = Controller.objects.get(prefix=prefix)
+    controller: Controller = Controller.objects.get(mqtt_user=mqtt_user)
     channels = Channel.objects.filter(controller=controller)
 
     if request.method == "POST":
@@ -161,17 +158,17 @@ def channel_naming(request, prefix):
                 if channel.name != data[f"chn{channel_number}_name"]:
                     channel.name = data[f"chn{channel_number}_name"]
                     channel.save()
-        return redirect("controller", prefix)
+        return redirect("controller", mqtt_user)
 
     return render(request, "main/channel_naming.html", {
         "cont": controller,
-        "prefix": prefix,
+        "mqtt_user": mqtt_user,
         "channels_names_json": [i.name for i in channels]
     })
 
 @login_required
-def controller(request, prefix):
-    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+def controller(request, mqtt_user):
+    if not ControllerV2Manager.check_auth(mqtt_user=mqtt_user, user=request.user):
         return redirect("/")
 
 
@@ -206,7 +203,7 @@ def controller(request, prefix):
 
         return out
 
-    instance = ControllerV2Manager.get_instance(prefix)
+    instance = ControllerV2Manager.get_instance(mqtt_user)
     if instance is not None:
         instance.command_get_state()
 
@@ -215,9 +212,9 @@ def controller(request, prefix):
             received_time = request.POST.dict()["set_time"].split("-")
             instance.command_set_time(*[int(i) for i in received_time])
 
-    programs = Program.objects.filter(channel__controller__prefix=prefix)
-    channels = Channel.objects.filter(controller__prefix=prefix)
-    cont = Controller.objects.get(prefix=prefix)
+    programs = Program.objects.filter(channel__controller__mqtt_user=mqtt_user)
+    channels = Channel.objects.filter(controller__mqtt_user=mqtt_user)
+    cont = Controller.objects.get(mqtt_user=mqtt_user)
 
     class Line:
         def __init__(self, name, status, data):
@@ -231,7 +228,7 @@ def controller(request, prefix):
 
     return render(request, 'main/controller.html',
                   {
-                      'prefix': prefix,
+                      'mqtt_user': mqtt_user,
                       'lines_week': lines,
                       'cont': cont,
                       'day': list(DAYS.values())[cont.day-1],
@@ -240,8 +237,8 @@ def controller(request, prefix):
                     })
 
 @login_required
-def controller_day(request, prefix, day):
-    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+def controller_day(request, mqtt_user, day):
+    if not ControllerV2Manager.check_auth(mqtt_user=mqtt_user, user=request.user):
         return redirect("/")
     def get_m(t):
         out = t // 2
@@ -255,7 +252,7 @@ def controller_day(request, prefix, day):
         stop[0] += (m + t % 60) // 60
         return start, stop
 
-    channels = Channel.objects.filter(controller__prefix=prefix)
+    channels = Channel.objects.filter(controller__mqtt_user=mqtt_user)
     lines = []
     for i in range(len(channels)):
         lines.append([])
@@ -264,7 +261,7 @@ def controller_day(request, prefix, day):
             for g in range(30):
                 lines[i][j].append(0)
     day_num = list(DAYS.keys()).index(day) + 1
-    programs = Program.objects.filter(channel__controller__prefix=prefix, days__contains=str(day_num))
+    programs = Program.objects.filter(channel__controller__mqtt_user=mqtt_user, days__contains=str(day_num))
 
 
     for p in programs:
@@ -285,28 +282,28 @@ def controller_day(request, prefix, day):
 
     return render(request, 'main/controller_day.html',
                   {
-                      'prefix': prefix,
+                      'mqtt_user': mqtt_user,
                       'day': DAYS[day],
                       'hours_total': [i for i in range(24)],
                       'lines_day': lines
                    })
 
 @login_required()
-def channels(request, prefix):
-    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+def channels(request, mqtt_user):
+    if not ControllerV2Manager.check_auth(mqtt_user=mqtt_user, user=request.user):
         return redirect("/")
 
-    channels = Channel.objects.filter(controller__prefix=prefix)
+    channels = Channel.objects.filter(controller__mqtt_user=mqtt_user)
 
 @login_required()
-def program(request, prefix, chn, prg_num):
-    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+def program(request, mqtt_user, chn, prg_num):
+    if not ControllerV2Manager.check_auth(mqtt_user=mqtt_user, user=request.user):
         return redirect("/")
-    if ControllerV2Manager.check_block(prefix):
-        return redirect("controller", prefix)
+    if ControllerV2Manager.check_block(mqtt_user):
+        return redirect("controller", mqtt_user)
 
-    instance = ControllerV2Manager.get_instance(prefix)
-    program = Program.objects.get(channel__controller__prefix=prefix, channel__number=chn, number=prg_num)
+    instance = ControllerV2Manager.get_instance(mqtt_user)
+    program = Program.objects.get(channel__controller__mqtt_user=mqtt_user, channel__number=chn, number=prg_num)
     weeks = program.get_weeks()
 
     if request.method == 'POST':
@@ -319,11 +316,11 @@ def program(request, prefix, chn, prg_num):
         t_max = int(data["prog_cmax"])
 
         instance.edit_or_add_program(chn, prg_num, days, weeks, hour, minute, t_min, t_max)
-        return redirect("channel", prefix, chn)
+        return redirect("channel", mqtt_user, chn)
 
     return render(request, "main/setup_wdays.html",
                   {
-                      "prefix": prefix,
+                      "mqtt_user": mqtt_user,
                       "chn": chn,
                       "prg_num": prg_num,
                       "time": f"{program.hour:02}:{program.minute:02}",
@@ -341,11 +338,11 @@ def program(request, prefix, chn, prg_num):
                   })
 
 @login_required
-def channel(request, prefix, chn, create_prg=False):
-    if not ControllerV2Manager.check_auth(prefix=prefix, user=request.user):
+def channel(request, mqtt_user, chn, create_prg=False):
+    if not ControllerV2Manager.check_auth(mqtt_user=mqtt_user, user=request.user):
         return redirect("/")
-    if ControllerV2Manager.check_block(prefix):
-        return redirect("controller", prefix)
+    if ControllerV2Manager.check_block(mqtt_user):
+        return redirect("controller", mqtt_user)
     def get_day(start, l):
         out = []
         for i in range(24):
@@ -412,16 +409,16 @@ def channel(request, prefix, chn, create_prg=False):
             self.t_min = t_min
             self.t_max = t_max
 
-    instance: ControllerV2Manager = ControllerV2Manager.get_instance(prefix)
+    instance: ControllerV2Manager = ControllerV2Manager.get_instance(mqtt_user)
 
     if create_prg:
         instance.create_program(chn)
-        return redirect("channel", prefix, chn)
+        return redirect("channel", mqtt_user, chn)
 
-    chan: Channel = Channel.objects.get(controller__prefix=prefix, number=chn)
+    chan: Channel = Channel.objects.get(controller__mqtt_user=mqtt_user, number=chn)
     programs = Program.objects.filter(channel=chan)
 
-    cont = Controller.objects.get(prefix=prefix)
+    cont = Controller.objects.get(mqtt_user=mqtt_user)
     lines = []
     prgs = []
     lines.append(get_week(chan))
@@ -443,11 +440,11 @@ def channel(request, prefix, chn, create_prg=False):
             chan.tempsens = int(data["tempsens"])
             instance.command_send_channel(chan.number)
             chan.save()
-            return redirect("controller", prefix)
+            return redirect("controller", mqtt_user)
 
     return render(request, 'main/channel.html',
                   {
-                      'prefix': prefix,
+                      'mqtt_user': mqtt_user,
                       'chn': int(chn),
                       'prgs': prgs,
                       'prg_data_json': json.dumps([i.toDict() for i in prgs]),

@@ -17,7 +17,7 @@
 	{% csrf_token %}
 </form>
 <script type="text/javascript">
-	const PREFIX = "{{ prefix }}"
+	const MQTT_USER = "{{ mqtt_user }}"
 	var channels_state = [];
 	var channels_meandrs = [];
 	var load_time = new Date();
@@ -98,7 +98,7 @@
 	}
 
 	var intervalId = window.setInterval(function(){
-  		socket.send(JSON.stringify({"prefix": PREFIX, "command": "get_properties"}));
+  		socket.send(JSON.stringify({"mqtt_user": MQTT_USER, "command": "get_properties"}));
 	}, 30000);
 
 	const socket = new WebSocket(
@@ -109,7 +109,7 @@
 
 	socket.onopen = function(e)
 	{
-	  	socket.send(JSON.stringify({"prefix": PREFIX, "command": "get_properties"}));
+	  	socket.send(JSON.stringify({"mqtt_user": MQTT_USER, "command": "get_properties"}));
 	};
 
 
@@ -140,14 +140,14 @@
 				formData.append("set_time", str_time);
 
 				var xhr = new XMLHttpRequest();
-  				xhr.open("POST", "{% url 'controller' prefix %}");
+  				xhr.open("POST", "{% url 'controller' mqtt_user %}");
   				xhr.send(formData);
 			}
 
 		}
 	}
 
-	var pattern = "{% url 'channel' prefix '-to_replace-' %}"
+	var pattern = "{% url 'channel' mqtt_user '-to_replace-' %}"
 	function redirect_to_channel(num)
 	{
 		let channel_num = current_page * 10 + num;
@@ -159,14 +159,14 @@
 		if (window.confirm("Приложение будет недоступно до окончания скачивания. Продолжить?"))
 		{
 			blocked = true;
-			socket.send(JSON.stringify({"prefix": PREFIX, "command": "download_data"}));
+			socket.send(JSON.stringify({"mqtt_user": MQTT_USER, "command": "download_data"}));
 		}
 	}
 
 	function save_name()
 	{
 		var name = document.getElementById("controller_name").value;
-		socket.send(JSON.stringify({"prefix": PREFIX, "command": "set_name", "data": name}));
+		socket.send(JSON.stringify({"mqtt_user": MQTT_USER, "command": "set_name", "data": name}));
 	}
 </script>
 <body>
@@ -197,7 +197,7 @@
 								<div id="controller_time" class="titlew">&#8986; &nbsp; &nbsp; Загрузка...</div>
 								<div id="mqtt_status" class="titlew">MQTT - Загрузка...</div>
 								<div class="titlew" style="margin-top: 20px; margin-bottom: 0px;">
-									Aquarius {{ prefix }}
+									Aquarius {{ mqtt_user }}
 								</div>
 								<input id="controller_name" type="text" style="width: 100%;" name="contr_name" value="Загрузка..." />
 							</div>
@@ -215,16 +215,16 @@
 
 						<div class="status__row" style="height: 9%;">
 							<div class="status__column">
-								<button type="button" onclick="document.location='{% url 'channel_naming' prefix %}'" name="chname" form="main_form">Названия<br>каналов</button>
+								<button type="button" onclick="document.location='{% url 'channel_naming' mqtt_user %}'" name="chname" form="main_form">Названия<br>каналов</button>
 							</div>
 
 							<div class="status__column">
-								<button type="button" onclick="document.location='{% url 'manual_activation_selector' prefix %}'"><img src="{% static 'img/hand.png' %}" alt="Ручное упр" title="Ручное упр" height=80%></button>
+								<button type="button" onclick="document.location='{% url 'manual_activation_selector' mqtt_user %}'"><img src="{% static 'img/hand.png' %}" alt="Ручное упр" title="Ручное упр" height=80%></button>
 
 							</div>
 
 							<div class="status__column">
-								<button type="button" onclick="document.location='{% url 'pause' prefix %}'"><img src="{% static 'img/pause.png' %}" alt="Пауза" title="Пауза" height=65%></button>
+								<button type="button" onclick="document.location='{% url 'pause' mqtt_user %}'"><img src="{% static 'img/pause.png' %}" alt="Пауза" title="Пауза" height=65%></button>
 							</div>
 
 							<div class="status__column">

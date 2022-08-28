@@ -10,8 +10,12 @@ class UserExtension(models.Model):
 
 
 class Controller(models.Model):
-    prefix = models.CharField(max_length=30, default="")
-    password = models.CharField(max_length=30, default="")
+    mqtt_host = models.CharField(max_length=30, default="")
+    mqtt_port = models.CharField(max_length=30, default="")
+    mqtt_user = models.CharField(max_length=30, default="")
+    mqtt_password = models.CharField(max_length=30, default="")
+    mqtt_prefix = models.CharField(max_length=30, default="")
+    email = models.CharField(max_length=50, default="")
     time = models.TimeField(default=datetime.time(0, 0, 0), auto_now=False, auto_now_add=False)
     day = models.IntegerField(default=0)
     week = models.BooleanField(default=False)
@@ -36,7 +40,7 @@ class Controller(models.Model):
 
 
     def __str__(self):
-        return self.prefix
+        return self.name
 
 class Channel(models.Model):
     id = models.AutoField(primary_key=True)
@@ -57,7 +61,7 @@ class Channel(models.Model):
     tempsens = models.IntegerField(default=1)
 
     def __str__(self):
-        return f"{self.controller.prefix} / {self.name}"
+        return f"{self.controller.name} / {self.name}"
 
 
 class Program(models.Model):
@@ -80,6 +84,6 @@ class Program(models.Model):
         return [bool(int(i)) for i in list(bin_weeks[2:4])]
 
     def __str__(self):
-        return f"{self.channel.controller.prefix} / {self.channel.number} / ({self.days}|{self.hour}:{self.minute})"
+        return f"{self.channel.controller.name} / {self.channel.number} / ({self.days}|{self.hour}:{self.minute})"
 
 

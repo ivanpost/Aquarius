@@ -1,29 +1,138 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=0">
+	<meta name="format-detection" content="telephone=no">
+	<title>Enable</title>
+	<!--<link rel="stylesheet" href="css/style.css">-->
+	{% load static %}
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="wrapper">
+        <div class="page">
+            <div class="page">
+                <div class="page__row">
 
-{% block title %}Aquarius{% endblock %}
+                    <div class="page__head">
+                        <div class="mhead">
+                            <div class="mhead__title">Выбор контроллера</Main></div>
+                            <a target="_blank" href="https://hi-garden.ru/aqua2-manual" class="mhead__manual xhref">&#8942;</a>		 
+                         </div>
+                    </div>
 
-{% block content %}
-<h1>Главная страница</h1>
-<br>
-<h3>Контроллеры:</h3>
-<br>
-<form action="" method="post">
-    {% csrf_token %}
-    <label for="user">Пользователь: </label>
-    <input type="text" id="user" name="user"><br><br>
-    <label for="password">Пароль: </label>
-    <input type="password" id="password" name="password"><br><br>
-    <button type="submit" class="btn btn-primary" >Добавить</button>
-</form>
-<br>
-{% if controllers|length > 0 %}
-<ul>
-    {% for cont in controllers %}
-    <li><a href="controllers/{{ cont.prefix }}">{{ cont.name }}</a></li>
-    {% endfor %}
-</ul>
-{% else %}
-Вы не добавили контроллеры
-{% endif %}
+                    <div class="page__body">
 
-{% endblock %}
+                        <div class="mbody">
+
+                            <div class="status" style="justify-content: flex-start;">
+
+                                <div class="status__row">
+                                    <div class="titlew">Контроллер:</div>
+                                </div>
+
+                                <form action="" method="post">
+                                    {% csrf_token %}
+
+                                    <div class="status__rowc">
+                                        <div class="status__column">
+                                            <div class="titlew">Name:</div>
+                                        </div>
+                                        <div class="status__column">
+                                            <input type="text" id="cname" name="cname" style="border: 1px solid gray;" value="Тестовый контроллер">
+                                        </div>
+                                    </div>
+
+                                    <div class="status__rowc">
+                                        <div class="status__column">
+                                            <div class="titlew">MQTT Broker:</div>
+                                        </div>
+                                        <div class="status__column">
+                                            <input type="text" id="server" name="server" style="border: 1px solid gray;" value="185.134.36.37">
+                                        </div>
+                                    </div>
+
+                                    <div class="status__rowc">
+                                        <div class="status__column">
+                                            <div class="titlew">MQTT Port:</div>
+                                        </div>
+                                        <div class="status__column">
+                                            <input type="text" id="port" name="port" style="border: 1px solid gray;" value="18883">
+                                        </div>
+                                    </div>
+
+                                    <div class="status__rowc">
+                                        <div class="status__column">
+                                            <div class="titlew">User:</div>
+                                        </div>
+                                        <div class="status__column">
+                                            <input type="text" id="user" name="user" style="border: 1px solid gray;" value="2E8">
+                                        </div>
+                                    </div>
+
+                                    <div class="status__rowc">
+                                        <div class="status__column">
+                                            <div class="titlew">Password:</div>
+                                        </div>
+                                        <div class="status__column">
+                                            <input type="password" id="password" name="password" style="border: 1px solid gray;" value="433987208">
+                                        </div>
+                                    </div>
+
+                                    <div class="status__rowc">
+                                        <div class="status__column">
+                                            <div class="titlew">Prefix:</div>
+                                        </div>
+                                        <div class="status__column">
+                                            <input type="text" id="prefix" name="prefix" style="border: 1px solid gray;" value="2E8/">
+                                        </div>
+                                    </div>
+
+                                    <div class="status__rowc">
+                                        <div class="status__column">
+                                            <div class="titlew">e-mail:</div>
+                                        </div>
+                                        <div class="status__column">
+                                            <input type="text" id="email" name="email" style="border: 1px solid gray;" value="user@hi-garden.ru">
+                                        </div>
+                                    </div>
+
+                                    <div class="status__row" style="width: 40%;">
+                                        <button type="submit" class="btn btn-primary" >Добавить</button>
+                                    </div>
+
+                                    <div class="status__row">
+                                        <div class="titlew">
+                                            {% if controllers|length > 0 %}
+                                            <ul>
+                                                {% for cont in controllers %}
+                                                <li><a  style="color: yellow;" href="controllers/{{ cont.mqtt_user }}">{{ cont.name }}</a></li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% else %}
+                                            Вы не добавили контроллеры
+                                            {% endif %}
+
+                                        </div>
+                                    </div>
+                                    
+                                </form>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    
+                    </div>
+
+                    <div class="page__footer"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+

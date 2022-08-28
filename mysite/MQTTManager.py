@@ -67,19 +67,21 @@ class MQTTManager:
         if message.topic.replace(self.prefix, '') in self.topicHandlers.keys():
             self.topicHandlers[message.topic.replace(self.prefix, "")](self, self.user, str(message.payload.decode("utf-8")).strip())
 
-    def __init__(self, user, password):
+    def __init__(self, host, port, user, password, prefix):
         self.topicHandlers = {}
-        self.host = '185.134.36.37'
-        self.port = 18883
+        self.host = host
+        self.port = port
         self.user = user
         self.password = password
-        self.prefix = f"{self.user}/"
+        self.prefix = prefix
 
     @staticmethod
-    def try_connect(user: str, password: str):
-        try:
-            m = MQTTManager(user, password)
+    def try_connect(host: str, port: int, user: str, password: str, prefix: str):
+        #try:
+            port = int(port)
+            m = MQTTManager(host, port, user, password, prefix)
             s = m.connect()
+            print(host, port, user, password, prefix, s)
             return m if s else None
-        except:
-            return None
+        #except:
+            #return None

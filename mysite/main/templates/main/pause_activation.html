@@ -69,54 +69,26 @@
 
 							<div class="status__column">
 								<div class="titlev">
-									<a href="{% url 'pause' prefix 1 %}" class="myxhref">1 мин</a>
+									<a href="{% url 'pause' mqtt_user 1 %}" class="myxhref">1 мин</a>
 								</div>
 								
 							</div>
 
 							<div class="status__column">
 								<div class="titlev">
-									<a href="{% url 'pause' prefix 3 %}" class="myxhref">3 мин</a>
+									<a href="{% url 'pause' mqtt_user 3 %}" class="myxhref">3 мин</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev">
-									<a href="{% url 'pause' prefix 5 %}" class="myxhref">5 мин</a>
+									<a href="{% url 'pause' mqtt_user 5 %}" class="myxhref">5 мин</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev">
-									<a href="{% url 'pause' prefix 10 %}" class="myxhref">10 мин</a>
-								</div>
-							</div>
-
-						</div>
-
-						<div class="status__row">
-
-							<div class="status__column">
-								<div class="titlev">
-									<a href="{% url 'pause' prefix 20 %}" class="myxhref">20 мин</a>
-								</div>
-							</div>
-
-							<div class="status__column">
-								<div class="titlev">
-									<a href="{% url 'pause' prefix 40 %}" class="myxhref">40 мин</a>
-								</div>
-							</div>
-
-							<div class="status__column">
-								<div class="titlev">
-									<a href="{% url 'pause' prefix 60 %}" class="myxhref">1 час</a>
-								</div>
-							</div>
-
-							<div class="status__column">
-								<div class="titlev">
-									<a href="{% url 'pause' prefix 180 %}" class="myxhref">3 часа</a>
+									<a href="{% url 'pause' mqtt_user 10 %}" class="myxhref">10 мин</a>
 								</div>
 							</div>
 
@@ -126,25 +98,53 @@
 
 							<div class="status__column">
 								<div class="titlev">
-									<a href="{% url 'pause' prefix 480 %}" class="myxhref">8 часов</a>
+									<a href="{% url 'pause' mqtt_user 20 %}" class="myxhref">20 мин</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev">
-									<a href="{% url 'pause' prefix 1440 %}" class="myxhref">24 часа</a>
+									<a href="{% url 'pause' mqtt_user 40 %}" class="myxhref">40 мин</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev">
-									<a href="{% url 'pause' prefix 2880 %}" class="myxhref">48 часов</a>
+									<a href="{% url 'pause' mqtt_user 60 %}" class="myxhref">1 час</a>
 								</div>
 							</div>
 
 							<div class="status__column">
 								<div class="titlev">
-									<a href="{% url 'pause' prefix 4320 %}" class="myxhref">72 часа</a>
+									<a href="{% url 'pause' mqtt_user 180 %}" class="myxhref">3 часа</a>
+								</div>
+							</div>
+
+						</div>
+
+						<div class="status__row">
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' mqtt_user 480 %}" class="myxhref">8 часов</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' mqtt_user 1440 %}" class="myxhref">24 часа</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' mqtt_user 2880 %}" class="myxhref">48 часов</a>
+								</div>
+							</div>
+
+							<div class="status__column">
+								<div class="titlev">
+									<a href="{% url 'pause' mqtt_user 4320 %}" class="myxhref">72 часа</a>
 								</div>
 							</div>
 
@@ -160,7 +160,7 @@
 
 							<div class="status__column">
 								<div class="titlev">
-									<a href="{% url 'pause' prefix 0 %}" class="myxhref">Возобновить<br>полив</a>
+									<a href="{% url 'pause' mqtt_user 0 %}" class="myxhref">Возобновить<br>полив</a>
 								</div>
 							</div>
 						</div>

@@ -47,7 +47,7 @@
 
 </div>
 <script type="text/javascript">
-	const prg_url_pattern = "{% url 'program' prefix chn '-to_replace-' %}";
+	const prg_url_pattern = "{% url 'program' mqtt_user chn '-to_replace-' %}";
 	var programs_data_json = '{{ prg_data_json|safe }}'
 	var programs_data = JSON.parse(programs_data_json);
 
@@ -95,7 +95,7 @@
 
 	function create_program()
 	{
-		window.location.replace("{% url 'create_program' prefix chn %}")
+		window.location.replace("{% url 'create_program' mqtt_user chn %}")
 	}
 
 	function save()
@@ -224,7 +224,7 @@
 								</div>
 
 								<div class="status__column">
-									<button onClick="window.location.replace('{% url 'manual_activation' prefix chn %}')" type="button" name="manual" form="channel_settings"><img src="{% static 'img/hand.png' %}" alt="Ручное упр" title="Ручное упр" height=50px></button>
+									<button onClick="window.location.replace('{% url 'manual_activation' mqtt_user chn %}')" type="button" name="manual" form="channel_settings"><img src="{% static 'img/hand.png' %}" alt="Ручное упр" title="Ручное упр" height=50px></button>
 								</div>
 
 								<div class="status__column">

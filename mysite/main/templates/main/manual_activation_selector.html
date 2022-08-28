@@ -12,7 +12,7 @@
 </head>
 {% include "includes/channels_selector_script.html" %}
 <script type="text/javascript">
-	var PREFIX = "{{ prefix }}"
+	var mqtt_user = "{{ mqtt_user }}"
 	var channels_state = [];
 
 	function update_data_on_page(properties)
@@ -33,7 +33,7 @@
 
 	socket.onopen = function(e)
 	{
-	  	socket.send(JSON.stringify({"prefix": PREFIX, "command": "get_properties"}));
+	  	socket.send(JSON.stringify({"mqtt_user": MQTT_USER, "command": "get_properties"}));
 	};
 
     socket.onmessage = function(event)
@@ -45,7 +45,7 @@
     	}
 	};
 
-	var pattern = "{% url 'manual_activation' prefix '-to_replace-' %}"
+	var pattern = "{% url 'manual_activation' mqtt_user '-to_replace-' %}"
 	function redirect_to_channel(num)
 	{
 		let channel_num = current_page * 10 + num;
@@ -249,7 +249,7 @@
 
 							<div class="status__column">
 								<div class="titlev">
-									<a href="{% url 'turn_off_all_channels' prefix %}" class="myxhref">Выключить все</a>
+									<a href="{% url 'turn_off_all_channels' mqtt_user %}" class="myxhref">Выключить все</a>
 									<br>&nbsp;
 								</div>
 

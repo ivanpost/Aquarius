@@ -17,13 +17,18 @@ def try_int(i):
 
 class ControllerV2Manager:
 
+    DEFAULT_HOST = "185.134.36.37"
+    DEFAULT_PORT = "18883"
+    DEFAULT_PREFIX_PATTERN = "{user}/"
+    DEFAULT_NAME_PATTERN = "Контроллер {user}"
+
     instances = {}
 
     cmd_pattern = ".1.2.3.4.3.2.1.{request_code}.{payload}.{check_sum[0]}.{check_sum[1]}.9.8.7.6.7.8.9.9."
     topic_send = "aqua_smart"
     topic_receive = "aqua_kontr"
 
-    prefix: str
+    user: str
     command_response_handlers: dict
 
     blocked: bool = False
@@ -34,25 +39,52 @@ class ControllerV2Manager:
     mqtt_manager: MQTTManager
 
     @staticmethod
-    def check_block(prefix: str):
-        c = ControllerV2Manager.get_instance(prefix)
+    def check_block(user: str):
+        c = ControllerV2Manager.get_instance(user, False)
         if c is None:
             return True
         return c.blocked
 
     @staticmethod
-    def get_instance(prefix: str):
-        if prefix in ControllerV2Manager.instances.keys():
-            return ControllerV2Manager.instances[prefix]
+    def get_instance(user: str, create: bool = True):
+        _filtered_controllers = Controller.objects.filter(mqtt_user=user)
+
+        if user in ControllerV2Manager.instances.keys():
+            return ControllerV2Manager.instances[user]
+        elif _filtered_controllers.exists() and create:
+            data_model = _filtered_controllers[0]
+            if ControllerV2Manager.check_auth(data_model.mqtt_user, data_model.mqtt_password):
+                print("Auth: OK")
+                if ControllerV2Manager.add(data_model.mqtt_user, data_model.mqtt_password):
+                    return ControllerV2Manager.instances[user]
+                else:
+                    return None
+            else:
+                return None
         else:
             return None
 
+
     @staticmethod
-    def add(prefix: str, password: str):
-        if ControllerV2Manager.get_instance(prefix) is None:
-            mqtt = MQTTManager.try_connect(prefix, password)
+    def add(user: str, password: str, **kwargs):
+        if ControllerV2Manager.get_instance(user, False) is None:
+            print("get instance is none")
+            mqtt = MQTTManager.try_connect(kwargs.get("host", ControllerV2Manager.DEFAULT_HOST),
+                                           kwargs.get("port", ControllerV2Manager.DEFAULT_PORT),
+                                           user,
+                                           password,
+                                           kwargs.get("prefix", ControllerV2Manager.DEFAULT_PREFIX_PATTERN.format(user=user)))
             if mqtt is not None:
-                cm = ControllerV2Manager(prefix, password, mqtt)
+                cm = ControllerV2Manager(kwargs.get("host", ControllerV2Manager.DEFAULT_HOST),
+                                         kwargs.get("port", ControllerV2Manager.DEFAULT_PORT),
+                                         user,
+                                         password,
+                                         kwargs.get("prefix", ControllerV2Manager.DEFAULT_PREFIX_PATTERN.format(user=user)),
+                                         mqtt)
+                if "email" in kwargs.keys():
+                    cm.set_email(kwargs["email"])
+                if "cname" in kwargs.keys():
+                    cm.set_name(kwargs["cname"])
                 cm.subscribe(mqtt)
                 cm.on_connected(mqtt)
                 return True
@@ -62,7 +94,7 @@ class ControllerV2Manager:
             return True
 
     @staticmethod
-    def check_auth(prefix: str = "", password: str = "", user: User = None) -> bool:
+    def check_auth(mqtt_user: str = "", password: str = "", user: User = None) -> bool:
         if user is not None:
             try:
                 saved_controllers = user.userextension.saved_controllers
@@ -75,18 +107,26 @@ class ControllerV2Manager:
                 saved_controllers = []
             else:
                 saved_controllers = json.loads(saved_controllers)
-            s_cont = [c for c in saved_controllers if c[0] == prefix]
+            s_cont = [c for c in saved_controllers if c[0] == mqtt_user]
             if len(s_cont) > 0:
                 return ControllerV2Manager.check_auth(s_cont[0][0], s_cont[0][1])
         else:
-            instance = ControllerV2Manager.get_instance(prefix)
-            return instance is not None and instance.data_model.prefix == prefix and instance.data_model.password == password
+            data_model = Controller.objects.get(mqtt_user=mqtt_user, mqtt_password=password)
+            return data_model is not None and data_model.mqtt_user == mqtt_user and data_model.mqtt_password == password
 
-    def __init__(self, controller_prefix: str, password: str, mqtt_manager: MQTTManager):
+    def __init__(self, host: str, port: int,  controller_user: str, password: str, prefix: str, mqtt_manager: MQTTManager):
+        ControllerV2Manager.instances[controller_user] = self
         try:
-            self.data_model = Controller.objects.get(prefix=controller_prefix)
-        except:
-            self.data_model = Controller(prefix=controller_prefix, password=password, name=f"Контроллер {controller_prefix}")
+            self.data_model = Controller.objects.get(mqtt_user=controller_user)
+        except ObjectDoesNotExist:
+            print("Create")
+            self.data_model = Controller(mqtt_user=controller_user,
+                                         mqtt_password=password,
+                                         mqtt_host=host,
+                                         mqtt_port=port,
+                                         mqtt_prefix=prefix,
+                                         name=ControllerV2Manager.DEFAULT_NAME_PATTERN.format(user=controller_user)
+                                         )
             self.data_model.save()
 
         for channel_num in range(1, 31):
@@ -99,15 +139,13 @@ class ControllerV2Manager:
                 Channel.objects.filter(controller=self.data_model, number=channel_num).delete()
 
         self.mqtt_manager = mqtt_manager
-        self.prefix = controller_prefix
+        self.user = controller_user
         self.command_response_handlers = {
             "8.8.8.8.8.8.8.8": self.command_get_state_response,
             "0.0.8": self.command_get_channels_response,
         }
-        ControllerV2Manager.instances[self.prefix] = self
 
     def subscribe(self, mqtt: MQTTManager) -> None:
-        print(f"Subscribe: {self.prefix}")
         mqtt.subscribe(self.topic_receive, self.handle_message)
         mqtt.onConnected = self.on_connected
 
@@ -119,7 +157,7 @@ class ControllerV2Manager:
             self.mqtt_manager.send(self.topic_send, msg)
 
     def turn_off_all_channels(self):
-        active_channels = Channel.objects.filter(controller__prefix=self.prefix, state=True)
+        active_channels = Channel.objects.filter(controller__mqtt_user=self.user, state=True)
 
         for i in active_channels:
             self.command_turn_on_channel(i.number, 0)
@@ -139,8 +177,12 @@ class ControllerV2Manager:
     def command_get_channels(self) -> None:
         self.send_command("0.0.8")
 
+    def set_email(self, email: str):
+        self.data_model.email = email
+        self.data_model.save()
+
     def edit_or_add_program(self, channel_num: int, prg_num: int, days: str, weeks: tuple, start_hour: int, start_minute: int, t_min: int, t_max: int):
-        chan = Channel.objects.get(controller__prefix=self.data_model.prefix, number=channel_num)
+        chan = Channel.objects.get(controller__mqtt_user=self.data_model.mqtt_user, number=channel_num)
         prg = Program.objects.filter(channel=chan, number=prg_num)
         if len(prg) > 0:
             prg = prg[0]
@@ -158,7 +200,7 @@ class ControllerV2Manager:
         self.command_send_channel(channel_num)
 
     def create_program(self, channel_num: int) -> Program:
-        chan = Channel.objects.get(controller__prefix=self.data_model.prefix, number=channel_num)
+        chan = Channel.objects.get(controller__mqtt_user=self.data_model.mqtt_user, number=channel_num)
         programs = Program.objects.filter(channel=chan)
         if len(programs) == 0:
             prg_num = 1
@@ -206,7 +248,7 @@ class ControllerV2Manager:
                 self.packet = -1
                 self.stashed_data = []
                 self.blocked = False
-                ControllerConsumer.send_data_downloaded(self.prefix)
+                ControllerConsumer.send_data_downloaded(self.data_model.mqtt_user)
                 return True
 
             missed_bytes = max((packet_number - self.packet - 1), 0) * bytes_in_packet
@@ -216,8 +258,13 @@ class ControllerV2Manager:
             print(f"Packet: {packet_number}")
 
             if packet_number >= total_packets - 1:
-                if len(self.stashed_data) < total_packets * bytes_in_packet:
-                    self.stashed_data += [0] * (total_packets * bytes_in_packet - len(self.stashed_data))
+                if len(self.stashed_data) != total_packets * bytes_in_packet:
+                    print("Invalid data")
+                    ControllerConsumer.send_data_downloaded(self.data_model.mqtt_user)
+                    self.packet = -1
+                    self.stashed_data = []
+                    self.blocked = False
+                    return True
 
                 skip_start = 20
                 self.stashed_data = self.stashed_data[skip_start:]
@@ -257,7 +304,7 @@ class ControllerV2Manager:
 
                     program_model.save()
 
-                ControllerConsumer.send_data_downloaded(self.prefix)
+                ControllerConsumer.send_data_downloaded(self.data_model.mqtt_user)
                 self.packet = -1
                 self.stashed_data = []
                 self.blocked = False
@@ -271,7 +318,7 @@ class ControllerV2Manager:
         return False
 
     def get_controller_properties(self) -> dict:
-        channels = Channel.objects.filter(controller__prefix=self.data_model.prefix)
+        channels = Channel.objects.filter(controller__mqtt_user=self.data_model.mqtt_user)
         channels_state = [i.state for i in channels]
 
         properties = {
@@ -358,7 +405,7 @@ class ControllerV2Manager:
                         db_chns[c].state = s
                         db_chns[c].save()
             self.data_model.save()
-            ControllerConsumer.send_properties(self.prefix, self.get_controller_properties())
+            ControllerConsumer.send_properties(self.user, self.get_controller_properties())
 
             return False
         except BaseException as ex:
