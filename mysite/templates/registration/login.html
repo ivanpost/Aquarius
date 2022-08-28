@@ -64,11 +64,18 @@
 
 								</table>
 
-								<input type="submit" id="subbtn" value="Войти" form="users" />
-								<input type="hidden" name="next" value="{{ next }}" form="users" />
+								<div class="status__row">
+									<div class="status__column">
+										<input type="submit" id="subbtn" value="Войти" form="users" />
+										<input type="hidden" name="next" value="{{ next }}" form="users" />
+									</div>
+									<div class="status__column">
+										<a href="{% url 'django_registration_register' %}" class="titlew myxhref" style="text-decoration: underline;"><br>Регистрация</a>
+									</div>
+								</div>
 
 							</form>
-							<a href="{% url 'django_registration_register' %}" class="mhead__logo xhref">Регистрация</a>
+							
 
 						</div>
 
