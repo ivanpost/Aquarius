@@ -357,7 +357,10 @@ def pump(request, mqtt_user):
     if request.method == "POST":
         data = request.POST.dict()
         if all([k in data.keys() for k in ("pmin", "pmax", "vmin", "vmax")]):
-            instance.configure_pump(float(data["pmin"]) * 10, float(data["pmax"]) * 10, float(data["vmin"]), float(data["vmax"]))
+            try:
+                instance.configure_pump(float(data["pmin"]) * 10, float(data["pmax"]) * 10, float(data["vmin"]), float(data["vmax"]))
+            except ValueError:
+                pass
         return redirect("controller", mqtt_user)
 
     pmin, pmax, vmin, vmax = instance.get_pump_settings()
@@ -365,8 +368,8 @@ def pump(request, mqtt_user):
     return render(request, "main/pump.html",
                   {
                       "mqtt_user": mqtt_user,
-                      "pmin": str(pmin / 10).replace(",", "."),
-                      "pmax": str(pmax / 10).replace(",", "."),
+                      "pmin": "{0:.1f}".format(pmin / 10).replace(",", "."),
+                      "pmax": "{0:.1f}".format(pmax / 10).replace(",", "."),
                       "vmin": str(vmin).replace(",", "."),
                       "vmax": str(vmax).replace(",", ".")
                   })
