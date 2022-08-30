@@ -5,7 +5,7 @@ import datetime
 from bitstring import BitArray
 from django.contrib.auth.models import User
 import json
-from typing import List
+from typing import List, Tuple
 from main.consumers import ControllerConsumer
 import threading
 def try_int(i):
@@ -27,6 +27,8 @@ class ControllerV2Manager:
     cmd_pattern = ".1.2.3.4.3.2.1.{request_code}.{payload}.{check_sum[0]}.{check_sum[1]}.9.8.7.6.7.8.9.9."
     topic_send = "aqua_smart"
     topic_receive = "aqua_kontr"
+
+    pump_channel_number = 10
 
     user: str
     command_response_handlers: dict
@@ -145,6 +147,7 @@ class ControllerV2Manager:
             "0.0.8": self.command_get_channels_response,
         }
 
+
     def subscribe(self, mqtt: MQTTManager) -> None:
         mqtt.subscribe(self.topic_receive, self.handle_message)
         mqtt.onConnected = self.on_connected
@@ -162,9 +165,40 @@ class ControllerV2Manager:
         for i in active_channels:
             self.command_turn_on_channel(i.number, 0)
 
+
     def wrap_command(self, request_code: str, payload: str) -> str:
         return self.cmd_pattern.format(request_code=request_code, payload=payload,
                                        check_sum=self.get_check_sum(request_code, payload))
+
+    def get_pump_state(self) -> bool:
+        """
+        Если давление включения и выключения на канале насоса равны, то возвращает False
+        :return:
+        Включен или выключен насос
+        """
+        pump_channel: Channel = Channel.objects.get(controller=self.data_model, number=self.pump_channel_number)
+        return pump_channel.press_on != pump_channel.press_off
+
+    def get_pump_settings(self) -> Tuple[float]:
+        """
+        Возвращает настройки насоса
+        :return:
+        Давление включения, давление выключения, минимальный расход, максимальный расход
+        """
+        pump_channel: Channel = Channel.objects.get(controller=self.data_model, number=self.pump_channel_number)
+        return pump_channel.press_on, pump_channel.press_off, pump_channel.volume_min, pump_channel.volume_max
+
+    def configure_pump(self, pressure_min: float, pressure_max: float,
+                       volume_min: float, volume_max: float) -> None:
+        pump_channel: Channel = Channel.objects.get(controller=self.data_model, number=self.pump_channel_number)
+
+        pump_channel.press_on = pressure_min
+        pump_channel.press_off = pressure_max
+        pump_channel.volume_min = volume_min
+        pump_channel.volume_max = volume_max
+        pump_channel.save()
+
+        self.command_send_channel(self.pump_channel_number)
 
     def command_turn_on_channel(self, channel_num, minutes) -> None:
         minutes_bytes = minutes.to_bytes(2, "big")
@@ -218,6 +252,7 @@ class ControllerV2Manager:
         prg.save()
         self.command_send_channel(channel_num)
         return prg
+    
 
     def command_send_channel(self, chn):
         channel = Channel.objects.get(controller=self.data_model, number=chn)

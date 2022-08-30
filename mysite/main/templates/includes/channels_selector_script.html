@@ -3,6 +3,7 @@
 	    var channels_names = {{ channels_names_json|safe }};
 	    var channels_state = [];
 	    var channels_meandrs = [];
+	    var hidden_channel = "{{ hidden_channel }}";
 
 		function set_channels(page=current_page, meandrs=true, display_state=true)
 		{
@@ -34,6 +35,15 @@
 				else
 				{
 				    document.getElementById('chn' + i.toString()).innerHTML = name;
+				}
+
+				if (hidden_channel != "" & parseInt(hidden_channel) == channel_number)
+				{
+				    document.getElementById('chn' + i.toString() + "_div").parentElement.style = "height: 0;"
+				}
+				else
+				{
+				    document.getElementById('chn' + i.toString()).style = "height: ;"
 				}
 
 

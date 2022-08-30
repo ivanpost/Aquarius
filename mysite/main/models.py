@@ -56,6 +56,8 @@ class Channel(models.Model):
     meaoff_cmax = models.IntegerField(default=0)
     press_on = models.FloatField(default=2.1)
     press_off = models.FloatField(default=3.8)
+    volume_min = models.FloatField(default=0.0)
+    volume_max = models.FloatField(default=0.0)
     lowlevel = models.BooleanField(default=False)
     rainsens = models.BooleanField(default=True)
     tempsens = models.IntegerField(default=1)

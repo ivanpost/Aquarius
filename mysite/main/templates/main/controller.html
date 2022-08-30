@@ -23,6 +23,7 @@
 	var load_time = new Date();
 	var controller_time = new Date(load_time.getFullYear(), load_time.getMonth(), load_time.getDate(), 0, 0, 0);
 	var paused = false;
+	var hidden_channel = "{{ hidden_channel }}";
 
 
 	function update_data_on_page(properties)
@@ -233,7 +234,7 @@
 
 						</div>
 
-						<div class="status__row">
+						<div class="status__row" {% if hide_channels_selector %} style="height: 0;" {% endif %}>
 							<div class="status__column">
 								<div id="chns_selector_0" class="titlef folderoff">
 									<a  onClick="javascript:set_channels(0);" role="button" href="#" class="myxhref">Каналы 1-10<br></a>
@@ -352,7 +353,7 @@
 
 							<div class="status__column">
 								<div class="titlev channeloff">
-									<a target="_blank" href="https://hi-garden.ru" class="myxhref">Насос</a>
+									<a href="{% url 'pump' mqtt_user %}" class="myxhref">Насос</a>
 									<div class="meandroff">&nbsp;</div>
 								</div>
 
@@ -406,7 +407,7 @@
 							</div>
 
 							<div class="status__column">
-								<div class="titlew">Avr: 159</div>
+								<div class="titlew">Avr: {{ cont.version }}</div>
 							</div>
 
 						</div>

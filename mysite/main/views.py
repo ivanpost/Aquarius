@@ -216,6 +216,10 @@ def controller(request, mqtt_user):
     channels = Channel.objects.filter(controller__mqtt_user=mqtt_user)
     cont = Controller.objects.get(mqtt_user=mqtt_user)
 
+    hide_channels_selector: bool = cont.version < 200
+    hidden_channel: str = "" if hide_channels_selector and not instance.get_pump_state() \
+        else str(instance.pump_channel_number)
+
     class Line:
         def __init__(self, name, status, data):
             self.status = status
@@ -233,7 +237,9 @@ def controller(request, mqtt_user):
                       'cont': cont,
                       'day': list(DAYS.values())[cont.day-1],
                       'channels_state_json': json.dumps([i.status for i in lines]),
-                      'channels_names_json': json.dumps([i.name for i in lines])
+                      'channels_names_json': json.dumps([i.name for i in lines]),
+                      "hide_channels_selector": hide_channels_selector,
+                      "hidden_channel": hidden_channel
                     })
 
 @login_required
@@ -335,6 +341,34 @@ def program(request, mqtt_user, chn, prg_num):
                       "d7": "7" in program.days,
                       "even_week": weeks[0],
                       "odd_week": weeks[1]
+                  })
+
+@login_required
+def pump(request, mqtt_user):
+    if not ControllerV2Manager.check_auth(mqtt_user=mqtt_user, user=request.user):
+        return redirect("/")
+    if ControllerV2Manager.check_block(mqtt_user):
+        return redirect("controller", mqtt_user)
+
+    instance: ControllerV2Manager = ControllerV2Manager.get_instance(mqtt_user)
+    if instance is None:
+        raise ValueError(f"Сущность менеджера контроллера '{mqtt_user}' не найдена.")
+
+    if request.method == "POST":
+        data = request.POST.dict()
+        if all([k in data.keys() for k in ("pmin", "pmax", "vmin", "vmax")]):
+            instance.configure_pump(float(data["pmin"]) * 10, float(data["pmax"]) * 10, float(data["vmin"]), float(data["vmax"]))
+        return redirect("controller", mqtt_user)
+
+    pmin, pmax, vmin, vmax = instance.get_pump_settings()
+
+    return render(request, "main/pump.html",
+                  {
+                      "mqtt_user": mqtt_user,
+                      "pmin": str(pmin / 10).replace(",", "."),
+                      "pmax": str(pmax / 10).replace(",", "."),
+                      "vmin": str(vmin).replace(",", "."),
+                      "vmax": str(vmax).replace(",", ".")
                   })
 
 @login_required
