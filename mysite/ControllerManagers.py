@@ -256,7 +256,7 @@ class ControllerV2Manager:
 
     def command_send_channel(self, chn):
         channel = Channel.objects.get(controller=self.data_model, number=chn)
-        chn_settings = [channel.cmin, channel.cmax, channel.meandr_on, channel.meaoff_cmin, channel.meaoff_cmax,
+        chn_settings = [channel.temp_min, channel.temp_max, channel.meandr_on, channel.meaoff_cmin, channel.meaoff_cmax,
                         int(channel.press_on * 10), int(channel.press_off * 10), 0, 0,
                         channel.season, 0, 0, 0, int(channel.rainsens), channel.tempsens, 0, 0, 0, 0]
         programs = Program.objects.filter(channel=channel)
@@ -313,9 +313,9 @@ class ControllerV2Manager:
                     except ObjectDoesNotExist:
                         channel_model: Channel = Channel(controller=self.data_model, number=i+1, name=f"Канал {i+1}")
 
-                    channel_model.cmin, channel_model.cmax, channel_model.meandr_on, channel_model.meaoff_cmin, \
-                    channel_model.meaoff_cmax, channel_model.press_on, channel_model.press_off,\
-                    _, _, channel_model.season, _, _, _, channel_model.rainsens, channel_model.tempsens,\
+                    channel_model.temp_min, channel_model.temp_max, channel_model.meandr_on, channel_model.meaoff_cmin, \
+                    channel_model.meaoff_cmax, channel_model.press_on, channel_model.press_off, \
+                    _, _, channel_model.season, _, _, _, channel_model.rainsens, channel_model.tempsens, \
                     channel_model.lowlevel, _, _, _, _ = self.stashed_data[offset:offset+20]
 
                     channel_model.save()
