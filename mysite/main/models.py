@@ -83,7 +83,10 @@ class Program(models.Model):
 
     def get_weeks(self) -> list:
         bin_weeks = bin(self.weeks)
-        return [bool(int(i)) for i in list(bin_weeks[2:4])]
+        output = [bool(int(i)) for i in list(bin_weeks[2:4])]
+        if len(output) < 2:
+            output += [False, ] * (2 - len(output))
+        return output
 
     def __str__(self):
         return f"{self.channel.controller.name} / {self.channel.number} / ({self.days}|{self.hour}:{self.minute})"
