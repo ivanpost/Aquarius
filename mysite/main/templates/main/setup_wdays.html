@@ -13,11 +13,16 @@
 </head>
 {% include "includes/utils.html" %}
 <script>
-	function all_days()
+	function a_days()
 	{
+		var new_state = false;
 		for (var i = 1; i < 8; i++)
 		{
-			document.getElementById("wd" + i.toString()).checked = true;
+			new_state = new_state | (!document.getElementById("wd" + i.toString()).checked);
+		}
+		for (var i = 1; i < 8; i++)
+		{
+			document.getElementById("wd" + i.toString()).checked = new_state;
 		}
 	}
 
@@ -116,7 +121,7 @@
 									<input {% if d7 %}checked{% endif %} type="checkbox" id="wd7" name="wd7" form="prog_settings" value="7" /><label for="wd7">Воскресенье</label>
 
 									<div class="wdbox__row">
-										<button onClick="all_days()" type="button" name="all_days" form="prog_settings" style="width: 200%; height: 100%">Все дни</button>
+										<button onClick="a_days()" type="button" name="all_days" form="prog_settings" style="width: 200%; height: 100%">Все дни</button>
 									</div>
 
 								</div>
