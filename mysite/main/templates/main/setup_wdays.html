@@ -96,36 +96,27 @@
 							<div class="status__column" style="background-color: #2E8B57; margin: 2%;">
 								<div class="wdbox">
 
-									<div class="wdbox__row">
-										<input {% if d1 %}checked{% endif %} type="checkbox" id="wd1" name="wd1" form="prog_settings" value="1" />&nbsp; &nbsp;Понедельник
-									</div>
+
+									<input {% if d1 %}checked{% endif %} type="checkbox" id="wd1" name="wd1" form="prog_settings" value="1" /><label for="wd1">Понедельник</label>
+
+									<input {% if d2 %}checked{% endif %} type="checkbox" id="wd2" name="wd2" form="prog_settings" value="2" /><label for="wd2">Bторник</label>
+
+
+									<input {% if d3 %}checked{% endif %} type="checkbox" id="wd3" name="wd3" form="prog_settings" value="3" /><label for="wd3">Среда</label>
+
+									<input {% if d4 %}checked{% endif %} type="checkbox" id="wd4" name="wd4" form="prog_settings" value="4" /><label for="wd4">Четверг</label>
+
+
+									<input {% if d5 %}checked{% endif %} type="checkbox" id="wd5" name="wd5" form="prog_settings" value="5" /><label for="wd5">Пятница</label>
+
+
+									<input {% if d6 %}checked{% endif %} type="checkbox" id="wd6" name="wd6" form="prog_settings" value="6" /><label for="wd6">Суббота</label>
+
+
+									<input {% if d7 %}checked{% endif %} type="checkbox" id="wd7" name="wd7" form="prog_settings" value="7" /><label for="wd7">Воскресенье</label>
 
 									<div class="wdbox__row">
-										<input {% if d2 %}checked{% endif %} type="checkbox" id="wd2" name="wd2" form="prog_settings" value="2" />&nbsp; &nbsp; Bторник
-									</div>
-
-									<div class="wdbox__row">
-										<input {% if d3 %}checked{% endif %} type="checkbox" id="wd3" name="wd3" form="prog_settings" value="3" />&nbsp; &nbsp; Среда
-									</div>
-
-									<div class="wdbox__row">
-										<input {% if d4 %}checked{% endif %} type="checkbox" id="wd4" name="wd4" form="prog_settings" value="4" />&nbsp; &nbsp;Четверг
-									</div>
-
-									<div class="wdbox__row">
-										<input {% if d5 %}checked{% endif %} type="checkbox" id="wd5" name="wd5" form="prog_settings" value="5" />&nbsp; &nbsp; Пятница
-									</div>
-
-									<div class="wdbox__row">
-										<input {% if d6 %}checked{% endif %} type="checkbox" id="wd6" name="wd6" form="prog_settings" value="6" />&nbsp; &nbsp; Суббота
-									</div>
-
-									<div class="wdbox__row">
-										<input {% if d7 %}checked{% endif %} type="checkbox" id="wd7" name="wd7" form="prog_settings" value="7" />&nbsp; &nbsp; Воскресенье
-									</div>
-
-									<div class="wdbox__row" style="width: 100%; height: 15%">
-										<button onClick="all_days()" type="button" name="all_days" form="prog_settings">Все дни</button>
+										<button onClick="all_days()" type="button" name="all_days" form="prog_settings" style="width: 200%; height: 100%">Все дни</button>
 									</div>
 
 								</div>
@@ -133,23 +124,12 @@
 							</div>
 
 							<div class="status__column" style="background-color: #2E8B57; margin: 2%;">
-								<div class="wdbox">
+								<div class="wdbox" style="height: 50%;">
 
-									<div class="wdbox__row">
-										<p>&nbsp; &nbsp; Неделя</p>
-									</div>
+									<label for="even">Неделя:</label>
 
-									<div class="wdbox__row">
-										<input {% if even_week %}checked{% endif %} type="checkbox" name="even" form="prog_settings" value="2" />&nbsp; &nbsp; Четная
-									</div>
-
-									<div class="wdbox__row">
-										<input {% if odd_week %}checked{% endif %} type="checkbox" name="odd" form="prog_settings" value="3" />&nbsp; &nbsp; Нечетная
-									</div>
-
-									<div class="wdbox__row">&nbsp;</div>
-									<div class="wdbox__row">&nbsp;</div>
-									<div class="wdbox__row">&nbsp;</div>
+									<input {% if even_week %}checked{% endif %} type="checkbox" id="even" name="even" form="prog_settings" value="2" /><label for="even">Четная</label>
+									<input {% if odd_week %}checked{% endif %} type="checkbox" id="odd"  name="odd" form="prog_settings" value="3" /><label for="odd">Нечетная</label>
 
 								</div>
 							</div>

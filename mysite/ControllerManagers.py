@@ -1,3 +1,5 @@
+import time
+
 from MQTTManager import MQTTManager
 from main.models import Controller, Channel, UserExtension, Program
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -142,11 +144,11 @@ class ControllerV2Manager:
 
         self.mqtt_manager = mqtt_manager
         self.user = controller_user
+        self.previous_time = datetime.time(0, 0, 0)
         self.command_response_handlers = {
             "8.8.8.8.8.8.8.8": self.command_get_state_response,
             "0.0.8": self.command_get_channels_response,
         }
-
 
     def subscribe(self, mqtt: MQTTManager) -> None:
         mqtt.subscribe(self.topic_receive, self.handle_message)
@@ -404,12 +406,19 @@ class ControllerV2Manager:
             data = kwargs["old_data"]
             s = list(map(try_int, data.split(".")))
             #[print(f"{num}: {i}") for num, i in enumerate(s)]
-            self.data_model.time = datetime.time(s[8], s[9], s[10])
+
+            is_time_updated = False
+            new_time = datetime.time(s[8], s[9], s[10])
+            if new_time != self.previous_time:
+                self.previous_time = self.data_model.time
+                self.data_model.time = new_time
+                is_time_updated = True
+
             self.data_model.day = s[11]
             self.data_model.week = bool(s[21])
             self.data_model.nearest_chn = s[23]
             try:
-                self.data_model.nearest_time = datetime.time(s[24], s[25])
+                    self.data_model.nearest_time = datetime.time(s[24], s[25])
             except ValueError:
                 self.data_model.nearest_time = datetime.time(0, 0)
             self.data_model.t1 = s[12]
@@ -440,10 +449,11 @@ class ControllerV2Manager:
                         db_chns[c].state = s
                         db_chns[c].save()
             self.data_model.save()
-            ControllerConsumer.send_properties(self.user, self.get_controller_properties())
+            ControllerConsumer.send_properties(self.user, self.get_controller_properties(),
+                                               is_time_updated=is_time_updated)
 
             return False
-        except BaseException as ex:
+        except Exception as ex:
             print(ex)
             return True
 

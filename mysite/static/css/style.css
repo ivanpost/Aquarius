@@ -315,7 +315,6 @@ body {
 }
 
 input {
-  width: 70%;
   color: #fff;
   font-size: 120%;
   font-weight: 700;
@@ -331,6 +330,7 @@ input[type=submit] {
   background: #4B0082;
   width: 40%;
   margin-left: 20%;
+  padding: 15px;
 }
 
 #bige {
@@ -347,7 +347,7 @@ input[type=submit] {
   flex-direction: column;
   justify-content: space-around;
   align-items: flex-start;
-  margin: 2% 8%;
+  margin: 2% 6%;
 }
 .wdbox__row {
   display: inline-flex;
@@ -408,5 +408,100 @@ table {
 }
 
 td {
-  padding: 15px 15px;
+  padding: 8px 8px;
+}
+
+label {
+  color: white;
+  margin: 2%;
+  word-wrap: break-word;
+  color: white;
+  font-size: 150%;
+  font-weight: 700;
+  line-height: 120%;
+}
+
+input[type=checkbox]:checked,
+input[type=checkbox]:not(:checked),
+input[type=radio]:checked,
+input[type=radio]:not(:checked) {
+  position: absolute;
+  left: -9999px;
+}
+
+input[type=checkbox]:checked + label,
+input[type=checkbox]:not(:checked) + label,
+input[type=radio]:checked + label,
+input[type=radio]:not(:checked) + label {
+  display: inline-block;
+  position: relative;
+  padding-left: 36px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+input[type=checkbox]:checked + label:before,
+input[type=checkbox]:not(:checked) + label:before,
+input[type=radio]:checked + label:before,
+input[type=radio]:not(:checked) + label:before {
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #dddddd;
+  background-color: #ffffff;
+  border-radius: 2px;
+}
+
+input[type=checkbox]:checked + label:before,
+input[type=checkbox]:not(:checked) + label:before {
+  border-radius: 2px;
+}
+
+input[type=radio]:checked + label:before,
+input[type=radio]:not(:checked) + label:before {
+  border-radius: 100%;
+}
+
+input[type=checkbox]:checked + label:after,
+input[type=checkbox]:not(:checked) + label:after,
+input[type=radio]:checked + label:after,
+input[type=radio]:not(:checked) + label:after {
+  content: "";
+  position: absolute;
+  transition: all 0.2s ease;
+}
+
+input[type=checkbox]:checked + label:after,
+input[type=checkbox]:not(:checked) + label:after {
+  left: 6px;
+  top: 7px;
+  width: 14px;
+  height: 8px;
+  border-radius: 1px;
+  border-left: 4px solid #006400;
+  border-bottom: 4px solid #006400;
+  transform: rotate(-45deg);
+}
+
+input[type=radio]:checked + label:after,
+input[type=radio]:not(:checked) + label:after {
+  left: 5px;
+  top: 5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 100%;
+  background-color: #006400;
+}
+
+input[type=checkbox]:not(:checked) + label:after,
+input[type=radio]:not(:checked) + label:after {
+  opacity: 0;
+}
+
+input[type=checkbox]:checked + label:after,
+input[type=radio]:checked + label:after {
+  opacity: 1;
 }/*# sourceMappingURL=style.css.map */

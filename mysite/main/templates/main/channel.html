@@ -135,7 +135,9 @@
 
 									<div class="status__column wdays">
 										<div class="titlew">
-											Канал 2
+											{{ chan.name }}
+											<br>
+											<button onClick="javascript:create_program()" type="button" name="new_prog" form="channel_settings">+ программа</button>
 										</div>
 									</div>
 
@@ -190,7 +192,7 @@
 
 							<div class="status__row" style="margin: 1% 0;">
 
-								<div class="status__column" style="flex-basis: 90%;">
+								<div class="status__column" style="flex: 0 0 44%;">
 									<div class="titlew">
 										<p style="text-align: left;">&nbsp; Импульсный режим:</p>
 										<p>импульс (c)  <input style="width: 40%;" type="number" name="meandr_on" form="channel_settings" value="{{ chan.meandr_on }}" size="2"/></p>
@@ -199,7 +201,7 @@
 									</div>
 								</div>
 
-								<div class="status__column" style="background-color: #2E8B57;">
+								<div class="status__column" style="flex: 0 0 30%; background-color: #2E8B57;">
 									<div class="titlew">
 										<p>Давление в<br>системе:</p>
 										<p>min <input id="press_on" style="width: 40%;" type="number" name="press_on" form="channel_settings" value="{% widthratio chan.press_on 10 1 %}" /></p>
@@ -208,48 +210,40 @@
 									</div>
 								</div>
 
-
-								<div class="status__column">
-									<div class="titlew">
-										<p><input {% if chan.lowlevel %}checked{% endif %} type="checkbox" id="lowlevel" name="lowlevel" form="channel_settings" value="yes" /><br><br>Работа при<br>пустом баке</p>
-									</div>
+								<div class="status__column" style="flex: 0 0 26%; padding-top: 20px;">
+									<input {% if chan.lowlevel %}checked{% endif %} type="checkbox" id="lowlevel" name="lowlevel" form="channel_settings" value="yes" /><label for="lowlevel" style="display: inline;"><br><br>Работа при пустом баке</label>
 								</div>
 
 							</div>
 
-							<div class="status__row">
+							<div class="status__row" style="height: 15%;">
 
-								<div class="status__column">
+								<div class="status__column" style="flex: 0 0 24%;">
 									<button onClick="save()" type="button" name="save_prog" form="channel_settings"><img src="{% static 'img/save.png' %}" alt="Сохранить" title="Сохранить" height=50px></button>
 								</div>
 
-								<div class="status__column">
+								<div class="status__column" style="flex: 0 0 24%;">
 									<button onClick="window.location.replace('{% url 'manual_activation' mqtt_user chn %}')" type="button" name="manual" form="channel_settings"><img src="{% static 'img/hand.png' %}" alt="Ручное упр" title="Ручное упр" height=50px></button>
 								</div>
 
-								<div class="status__column">
-									<div class="titlew">
-										<p><input {% if chan.rainsens %}checked{% endif %} type="checkbox" id="rainsens_on" name="rainsens_on" form="channel_settings" value="yes" /><br><br>Использовать<br>датчик дождя</p>
-									</div>
+								<div class="status__column" style="flex: 0 0 26%; padding-top: 20px;">
+									<input {% if chan.rainsens %}checked{% endif %} type="checkbox" id="rainsens_on" name="rainsens_on" form="channel_settings" value="yes" /><label for="rainsens_on" style="display: inline;"><br>Использовать датчик дождя</label>
 								</div>
 
-								<div class="status__column">
-									<div class="status__row">
-										<div class="status__column">
-											<div class="titlew">
-												<p><input {% if chan.tempsens == 1 %}checked{% endif %} type="radio" id="tempsens1" name="tempsens" form="channel_settings" value="1" /> 1</p>
-												<br>
-												<p><input {% if chan.tempsens == 2 %}checked{% endif %}type="radio" id="tempsens2" name="tempsens" value="2" /> 2</p>
-											</div>
-										</div>
-										<div class="status__column">
-											<br>
-											<div class="imgsm">
-												<img src="{% static 'img/measure.png' %}" width="120%"  alt="">
-											</div>
-										</div>
-									</div>
+								<div class="status__column" style="flex: 0 0 13%; padding-top: 15px;">
+
+									<input {% if chan.tempsens == 1 %}checked{% endif %} type="radio" id="tempsens1" name="tempsens" form="channel_settings" value="1" /><label for="tempsens1">1<br>&nbsp;</label>
+
+									<input {% if chan.tempsens == 2 %}checked{% endif %} type="radio" id="tempsens2" name="tempsens" value="2" /><label for="tempsens2">2</label>
+
 								</div>
+								<div class="status__column" style="flex: 0 0 13%;">
+									<br>
+									<div class="imgsm">
+											<img src="{% static 'img/measure.png' %}" width="120%"  alt="">
+										</div>
+								</div>
+							
 							</div>
 					</div>
 

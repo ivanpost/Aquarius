@@ -1,0 +1,74 @@
+{% extends "main/base.html" %}
+
+{% block title %}Настройка насоса{% endblock %}
+
+{% block content %}
+
+<form id="pump" method="post" action="{% url 'pump' mqtt_user %}" style="height: 95%;">
+	{% csrf_token %}
+
+	<div class="status">
+
+		<div class="status__row">
+			<table>
+				<tr>
+					<td>Включить насос при<br> давлении (бар):</td>
+					<td style="border: 1px solid gray;"><input name="pmin" value="{{ pmin }}"/></td>
+				</tr>
+				<tr></tr>
+				<tr>
+					<td>Выключить насос при<br> давлении (бар):</td>
+					<td style="border: 1px solid gray;"><input name="pmax" value="{{ pmax }}"/></td>
+				</tr>
+			</table>
+
+		</div>
+
+		<div class="status__row">
+			<div class="titlew">
+				<p style="text-align: left; white-space: pre-line;">
+					Указанные настройки насоса действуют по умолчанию! Настройки других каналов имеют более высокий приоритет.<br>
+					Для отключения функции управления насосом, нужно оба параметра установить в 0
+				</p>
+			</div>
+		</div>
+
+
+		<div class="status__row">
+			<table>
+				<tr>
+					<td>Минимальный расход<br>(л/мин):</td>
+					<td style="border: 1px solid gray;"><input name="vmin" value="{{ vmin }}"/></td>
+				</tr>
+				<tr></tr>
+				<tr>
+					<td>Максимальный расход<br>(л/мин):</td>
+					<td style="border: 1px solid gray;"><input name="vmax" value="{{ vmax }}"/></td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="status__row">
+			<div class="titlew">
+				<p style="text-align: left; white-space: pre-line;">
+					Расход воды приводится с учетом кривой NPSH поверхностного насоса.<br>
+					При выходе показателей расхода-давления за допустимые пределы, работа насоса и всех каналов будет приостановлена на 1 час.
+				</p>
+			</div>
+		</div>
+
+
+
+		<div class="status__row">
+
+			<div class="status__column" style="width: 30%;">
+				<button type="submit" name="save"><img src="{% static 'img/save.png' %}" alt="Сохранить" title="Сохранить" height=50px></button>
+			</div>
+
+		</div>
+
+	</div>
+
+</form>
+
+{% endblock %}

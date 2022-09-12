@@ -35,8 +35,8 @@
 		else
 		{
 			document.getElementById("mbody").style.backgroundColor = "#2F4F4F";
-		}
 
+		}
 
 		if (properties["hour"] != undefined & properties["minute"] != undefined & properties["second"] != undefined)
 		{
@@ -100,7 +100,7 @@
 
 	var intervalId = window.setInterval(function(){
   		socket.send(JSON.stringify({"mqtt_user": MQTT_USER, "command": "get_properties"}));
-	}, 30000);
+	}, 60000);
 
 	const socket = new WebSocket(
             'ws://'

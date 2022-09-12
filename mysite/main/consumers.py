@@ -25,8 +25,18 @@ class ControllerConsumer(WebsocketConsumer):
             ControllerConsumer.consumers[prefix].send(text_data=json.dumps({"type": "data_downloaded"}))
 
     @staticmethod
-    def send_properties(prefix, properties):
+    def send_properties(prefix, properties, is_time_updated=True):
         properties["type"] = "properties"
+
+        # если время не изменилось с последней отправки, то не отправляем его на страницу.
+        # необходимо, чтобы не появлялось предложение синхронизировать время в случае,
+        # если на сервере не успели обновиться данные
+        if not is_time_updated:
+            for k in ("hour", "minute"):
+                if k in properties.keys():
+                    del properties[k]
+
+
         if prefix in ControllerConsumer.consumers.keys():
             ControllerConsumer.consumers[prefix].send(text_data=json.dumps(properties))
 
@@ -36,12 +46,13 @@ class ControllerConsumer(WebsocketConsumer):
         json_data = json.loads(text_data)
         if "mqtt_user" not in json_data.keys() or "command" not in json_data:
             self.send(text_data=json.dumps({'error': "invalid syntax"}))
+            return
 
         mqtt_user = json_data["mqtt_user"]
         ControllerConsumer.consumers[mqtt_user] = self
 
         command = json_data["command"]
-        print(mqtt_user)
+
         instance = ControllerV2Manager.get_instance(mqtt_user)
         if instance is None:
             self.send(text_data=json.dumps({'error': "invalid prefix"}))

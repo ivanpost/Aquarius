@@ -465,11 +465,11 @@ def channel(request, mqtt_user, chn, create_prg=False):
         if request.method == 'POST':
             data = request.POST.dict()
             chan.season = int(data["seasonpc"])
-            chan.temp_min = int(data["cmindeg"])
-            chan.temp_max = int(data["cmaxdeg"])
-            chan.meandr_on = int(data["meandr_on"])
-            chan.meaoff_cmin = int(data["meaoff_cmin"])
-            chan.meaoff_cmax = int(data["meaoff_cmax"])
+            chan.temp_min = int(data["cmindeg"]) if data["cmindeg"] else chan.temp_min
+            chan.temp_max = int(data["cmaxdeg"]) if data["cmaxdeg"] else chan.temp_max
+            chan.meandr_on = int(data["meandr_on"]) if data["meandr_on"] else chan.meandr_on
+            chan.meaoff_cmin = int(data["meaoff_cmin"]) if data["meaoff_cmin"] else chan.meaoff_cmin
+            chan.meaoff_cmax = int(data["meaoff_cmax"]) if data["meaoff_cmax"] else chan.meaoff_cmax
             chan.press_on = float(data["press_on"]) * 10
             chan.press_off = float(data["press_off"]) * 10
             chan.lowlevel = "lowlevel" in data.keys()
