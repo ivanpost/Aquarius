@@ -137,7 +137,7 @@ class ControllerV2Manager:
             try:
                 channel = Channel.objects.get(controller=self.data_model, number=channel_num)
             except ObjectDoesNotExist:
-                channel = Channel(controller=self.data_model, number=channel_num)
+                channel = Channel(controller=self.data_model, name=f"Канал {channel_num}", number=channel_num)
                 channel.save()
             except MultipleObjectsReturned:
                 Channel.objects.filter(controller=self.data_model, number=channel_num).delete()
